@@ -1,0 +1,18 @@
+
+<p>For the purpose of this demo, we'll track the application name
+	environment variable when starting the test.</p>
+
+<ol>
+	<li>Deploy V2 (green) of the application</li>
+	<li>Add the <i>production route</i> to application V2 (green)
+	</li>
+	<li>Ensure to control the load from V1 (blue) to V2 (green) by
+		making sure you have more V1 (blue) application instance. For example,
+		2 x 1 application instances ensure V1 (blue) gets double the amount of
+		requests.
+	<li>Decrease V1 (blue) instances, increase V2 (green) as
+		confidence builds</li>
+	<li>Remove the <i>production route</i> of V1 (blue).
+	</li>
+</ol>
+

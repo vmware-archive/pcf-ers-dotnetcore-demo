@@ -1,0 +1,33 @@
+
+<p>In this page we can exercise how applications in PCF can use
+	services. By default the applications uses H2 as an embedded database
+	but it auto detects and uses any PCF database bound to it.</p>
+
+<p>The diagram below illustrates the PCF components. We have Ops
+	Manager controlling the provisioning of services where PCF ERS is the
+	core platform runtime services.</p>
+
+<img src="/images/services1.png"
+	class="img-rounded img-responsive center-block" alt="Cinque Terre"
+	width="600" height="200">
+
+<p>Pivotal Ops manager can also provision and manage other services.
+	The Service Broker components implements an PCF ERS API that allows
+	services to expose their catalog in the PCF Marketplace where they can
+	create service instances.</p>
+
+<p>
+	We understand that not all the platform services are managed by it. So
+	you can implement your own Service Broker and registere with PCF ERS or
+	you can simply use the concpet of User Provided Services. <a
+		href="http://docs.pivotal.io/pivotalcf/devguide/services/"
+		target="_blank">&nbsp;Learn more Services.</a>
+</p>
+
+
+<p>Below are things we'll demonstrate.</p>
+<ul>
+	<li>Create and Bind Services by using PCF Marketplace</li>
+	<li>Auto Scaling Services</li>
+	<li>User Provided Services - TDB</li>
+</ul>

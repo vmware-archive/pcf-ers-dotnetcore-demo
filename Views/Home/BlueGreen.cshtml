@@ -1,0 +1,142 @@
+﻿@using Articulate.Models
+<div class="container" role="main">
+
+		<span id="tutorialName" style="display: none;">bluegreen</span>
+
+		<div class="row ">
+			<div class="page-header">
+				<p>&nbsp;</p>
+				<h1>Blue Green Deployment</h1>
+			</div>
+		</div>
+
+		<div class="row ">
+
+			<div class="col-md-6">
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<div id="bluegreenBlock">
+							<p>How hard it is for you to upgrade your application with
+								minimal downtime?</p>
+							<p>
+								This page shows the load balancing between application versions
+								based on route mappings. In our basics page we discussed the
+								concept of routes and how they can be mapped to many application
+								deployments. <a data-toggle="collapse" data-parent="#accordion"
+									href="#collapseOne">Learn more - Description</a>
+							</p>
+						</div>
+						<div id="donut-example" style="height: 250px;"></div>
+					</div>
+					<div class="panel-footer clearfix">
+						<div class="pull-right">
+							<a id="resetButton" href="javascript:reset();"
+								class="btn btn-default">Reset</a> <a id="resetButton"
+								href="/bluegreen" class="btn btn-default">Refresh</a> <a
+								id="loadButton" href="javascript:toggleTimer();"
+								class="btn btn-default">Start Simulation</a>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-6">
+				@await Html.PartialAsync("Tutorial", (AppEnv)ViewBag.AppEnv)
+			</div>
+
+		</div>
+		<!--  ROW -->
+
+	</div>
+
+	<script>
+		var INTERVAL = 1000
+		var timerID = 0;
+		var versions = {};
+
+		var colors = [ "#90A6D4", "#90D49C" ];
+
+		function reset() {
+			for (var version in versions) {
+				versions[version] = 0;
+			}
+		}
+
+		function toggleTimer() {
+			if (timerID == 0) {
+				startTimer();
+				$('#loadButton').text("Stop Simulation");
+				$('#resetButton').hide();
+			} else {
+				stopTimer();
+				$('#loadButton').text("Start Simulation");
+				$('#resetButton').show();
+			}
+		}
+
+		var chartData = [ {
+			label : "blue",
+			value : 10
+		}, {
+			label : "green",
+			value : 1
+		} ]
+
+		var chart = Morris.Donut({
+			element : 'donut-example',
+			colors : colors,
+			data : chartData,
+			resize : true
+		});
+
+		function startTimer() {
+			timerID = setInterval(startLoad, INTERVAL);
+		}
+
+		function stopTimer() {
+			if (timerID) {
+				clearInterval(timerID);
+				timerID = 0;
+			}
+		}
+
+		function startLoad() {
+
+			$.get("/bluegreen-check", function(appEnv) {
+
+				var appName = appEnv[0]
+
+				if (appName in versions) {
+					versions[appName] = 1 + versions[appName];
+				} else {
+					versions[appName] = 1;
+				}
+
+				var html = '';
+
+				chartData = [];
+
+				// MMB: This can be templated instead of creating HTML in the function
+				var i = 2;
+				for ( var version in versions) {
+					html += '<p><b><span style="color:' + colors[i % 2] + '">'
+							+ version + '</span></b> - ' + versions[version]
+							+ '</p>'
+
+					i++;
+
+					item = {};
+					item.label = version;
+					item.value = versions[version];
+					chartData.push(item);
+				}
+
+				chart.setData(chartData);
+
+				$('#bluegreenBlock').html(html);
+			});
+
+		}
+	</script>
+
+	<!--  /.PAGE BODY -->

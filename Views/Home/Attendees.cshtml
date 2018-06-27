@@ -1,0 +1,114 @@
+﻿@using Articulate.Models
+@model System.Collections.Generic.List<Articulate.Models.Attendee>
+
+<!--  PAGE BODY -->
+<div class="container" role="main">
+
+	<span id="tutorialName" style="display: none;">services</span>
+
+	<div class="page-header">
+		<p>&nbsp;</p>
+		<h1>Services</h1>
+	</div>
+
+
+	<div class="row">
+		<div class="col-md-12">
+			<p>By now we understand a bit about how applications are being
+				managed in PCF, what about services? Let's think of services as
+				external application dependencies like a datastore or messaging
+				system. But it can represent many other things that we would not
+				typically think of it.</p>
+
+			<p>Remember the application diagram from the main page?</p>
+
+			<p>
+				We often hear about <b>The Twelve-Factor App</b> as a great
+				methodology for building modern applications. Pivotal Cloud Foundry
+				Service strategy is very much like <a
+					                                   href="http://12factor.net/backing-services">IV - Backing
+					Services factor</a>. Services are <i>attached</i>, in PCF case, <i>bound</i>
+				to applications.
+			</p>
+		</div>
+
+	</div>
+
+
+	<div class="row">
+
+		<div class="col-md-8">
+
+			<h4>Attendees Database Tool</h4>
+
+			<div class="col-md-4">
+				<div class="panel panel-default">
+					@if (ViewBag.AddFailed == true)
+					{
+						<div class="alert alert-danger" th:if="${addFailed}">
+							There was a problem adding an attendee. Is the <b>attendee-service</b> running?
+						</div>
+					}
+					<div class="panel-body">
+						<form id="attendee-form" action="add-attendee" method="post"
+						      role="form">
+							<div class="form-group required">
+								<label>First Name</label>
+								<input type="text"
+								       class="form-control" required="required" id="firstName"
+								       name="firstName" th:value="${firstName}"></input>
+							</div>
+							<div class="form-group">
+								<label>Last Name</label>
+								<input type="text"
+								       class="form-control" required="required" id="lastName"
+								       name="lastName" th:value="${lastName}"></input>
+							</div>
+							<div class="form-group">
+								<label>Email</label>
+								<input type="email" class="form-control"
+								       required="required" id="emailAddress" name="emailAddress" th:value="${emailAddress}"></input>
+							</div>
+							<button type="submit" class="btn btn-default center-block">Add</button>
+						</form>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-8">
+				<div id="resultsBlock">
+					<div class="panel panel-default">
+						<table class="table table-fixed">
+							<thead>
+							<tr>
+								<th class="col-xs-3">First Name</th>
+								<th class="col-xs-3">Last Name</th>
+								<th class="col-xs-6">Email Address</th>
+							</tr>
+							</thead>
+							<tbody>
+							@foreach (var attendee in Model)
+							{
+								<tr th:each="attendee : ${attendees}">
+									<td class="col-xs-3">@attendee.FirstName</td>
+									<td class="col-xs-3">@attendee.LastName</td>
+									<td class="col-xs-6">@attendee.EmailAddress</td>
+								</tr>
+							}
+							</tbody>
+						</table>
+					</div>
+					</div>
+				<a href="/services" class="btn btn-default center-block">Refresh</a>
+				<a href="/clean" class="btn btn-danger center-block">Erase All Records</a>
+			</div>
+		</div>
+
+		<div class="col-md-4">
+			@await Html.PartialAsync("Tutorial", (AppEnv)ViewBag.AppEnv)
+		</div>
+
+	</div>
+	<!-- ROW -->
+
+</div>

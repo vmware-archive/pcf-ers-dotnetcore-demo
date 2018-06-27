@@ -1,0 +1,19 @@
+
+<p>If you remember the application architecture, we have a
+	microservice embedded in this application deployment. By default the
+	application uses an embedded DB, H2. Therefore, if you have multiple
+	application instances you'll have multiple databases.</p>
+<p>So, here is how we demonstrate the PCF services capabilities</p>
+<ul>
+	<li>Marketplace - Let's make sure you understand the concept of a
+		marketplace - We may have to introduce the Cloud Foundry Service
+		Broker API and talks about managed services.</li>
+	<li>Auto-Scaler - Before we bind the database services, we can
+		talk about auto-scaler service</li>
+	<li>State - Then we can bind the mysql service. Create and Bind a
+		service from Apps Manager and explain how the information is injected
+		into the container as environment variables.</li>
+	<li>Now we can exercise the UI and see the state is not lost and
+		shared among all application instances</li>
+</ul>
+

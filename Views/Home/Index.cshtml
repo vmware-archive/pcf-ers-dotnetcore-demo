@@ -1,0 +1,59 @@
+﻿@using Articulate.Models
+@model Articulate.Models.AppEnv
+<div class="container" role="main">
+
+	<span id="tutorialName" style="display: none;">index</span>
+		
+	<div class="page-header">
+		<p>&nbsp;</p>
+		<h1>Welcome to the Cloud Foundry Basic Demo!</h1>
+	</div>
+
+	<div class="row ">
+		
+		<div class="col-md-6">
+			<p>The purpose of this application is to demonstrate some basic
+				capabilities of the Pivotal Cloud Foundry Platform, in particular
+				the Pivotal Elastic Runtime Service which is the core component
+				responsible for running the application workloads as containers.</p>
+			<h3>Application Components and Architecture</h3>
+			<p>Currently the application is one deployment with the UI and
+				backend packaged inside the same artifact - Spring Boot jar.
+				However, logically the UI/client is completely separate from the
+				backend services.</p>
+			<img src="~/images/index2.png"
+			     class="img-rounded img-responsive center-block" alt="Cinque Terre"
+			     width="600" height="200" />
+			<h3>How to use this Application</h3>
+			<p>
+				Each menu item above links to a page that helps demonstrate a set
+				of capabilities. The last item, Spring Boot, highlights the Spring
+				Framework project that helps build production ready cloud
+				applications and microservices in minutes. Spring Boot is not the
+				focus on this demo. <a href="http://projects.spring.io/spring-boot/" target="_blank">Learn
+					more.</a>
+			</p>
+			<p>Each page has the same layout with the Accordion control and
+				3 groups:</p>
+			<ol>
+				<li><b>Application Environment Information</b> - This provides
+					information about the application environment when running inside
+					PCF. You can see the Application Name, Container and Services
+					information. This is useful to show things like load balancing,
+					self healing, service binding among other things.</li>
+				<li><b>Description</b> - We provide information on the current
+					page and additional resources.</li>
+				<li><b>Demonstration</b> - We list the things that can be
+					demonstrated in the particular page.</li>
+			</ol>
+		</div>
+			
+		<div class="col-md-6">
+			@await Html.PartialAsync("Tutorial", (AppEnv)ViewBag.AppEnv)
+			@* <partial name="Shared/Tutorial.cshtml" model="ViewBag.AppEnv"/> *@
+		</div>
+
+	</div>
+
+
+</div>
