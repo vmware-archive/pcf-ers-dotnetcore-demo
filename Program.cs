@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 using Steeltoe.Extensions.Configuration.CloudFoundry;
+using Steeltoe.Extensions.Logging;
 
 namespace Articulate
 {
@@ -15,6 +17,11 @@ namespace Articulate
             WebHost.CreateDefaultBuilder(args)
                 .UseCloudFoundryHosting()
                 .AddCloudFoundry()
+                .ConfigureLogging((builderContext, loggingBuilder) =>
+                {
+                    loggingBuilder.AddConfiguration(builderContext.Configuration.GetSection("Logging"));
+                    loggingBuilder.AddDynamicConsole();
+                })
                 .UseStartup<Startup>()
                 .Build();
     }

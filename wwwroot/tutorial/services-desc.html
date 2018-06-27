@@ -1,7 +1,8 @@
 
 <p>In this page we can exercise how applications in PCF can use
-	services. By default the applications uses H2 as an embedded database
-	but it auto detects and uses any PCF database bound to it.</p>
+	services. By default the applications uses SQLite in memory database
+	but will use MySQL instead automatically if it detects that it's bound
+	as a service.</p>
 
 <p>The diagram below illustrates the PCF components. We have Ops
 	Manager controlling the provisioning of services where PCF ERS is the

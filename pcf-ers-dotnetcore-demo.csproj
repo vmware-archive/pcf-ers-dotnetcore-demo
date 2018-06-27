@@ -7,9 +7,9 @@
     <AssemblyName>Articulate</AssemblyName>
     <RootNamespace>Articulate</RootNamespace>
     <IsPackable>true</IsPackable>
-
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="GitInfo" Version="2.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.0.1" />
     <PackageReference Include="Steeltoe.CloudFoundry.Connector.EFCore" Version="2.0.0" />
@@ -17,6 +17,19 @@
     <PackageReference Include="Steeltoe.Management.CloudFoundryCore" Version="2.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Pages\Home" />
+    <None Include="git.properties">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
+  <Target Name="_GitProperties" AfterTargets="CoreCompile">
+    <WriteLinesToFile File="git.properties" Lines="git.remote.origin.url=$(GitRoot)" Overwrite="true" />
+    <WriteLinesToFile File="git.properties" Lines="git.build.version=$(GitBaseVersion)" Overwrite="false" />
+    <WriteLinesToFile File="git.properties" Lines="git.commit.id.abbrev=$(GitCommit)" Overwrite="false" />
+    <WriteLinesToFile File="git.properties" Lines="git.commit.id=$(GitSha)" Overwrite="false" />
+    <WriteLinesToFile File="git.properties" Lines="git.tags=$(GitTag)" Overwrite="false" />
+    <WriteLinesToFile File="git.properties" Lines="git.branch=$(GitBranch)" Overwrite="false" />
+    <WriteLinesToFile File="git.properties" Lines="git.build.time=$([System.DateTime]::Now.ToString('O'))" Overwrite="false" />
+    <WriteLinesToFile File="git.properties" Lines="git.build.user.name=$([System.Environment]::GetEnvironmentVariable('USERNAME'))" Overwrite="false" />
+    <WriteLinesToFile File="git.properties" Lines="git.build.host=$([System.Environment]::GetEnvironmentVariable('COMPUTERNAME'))" Overwrite="false" />
+  </Target>
 </Project>

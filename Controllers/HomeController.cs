@@ -104,7 +104,7 @@ namespace Articulate.Controllers
         {
             foreach (var envVar in Environment.GetEnvironmentVariables().Cast<DictionaryEntry>())
             {
-                Console.WriteLine($"{envVar.Key}: {envVar.Value}");
+                _log.LogInformation($"{envVar.Key}: {envVar.Value}");
             }
 
             return View();
@@ -113,7 +113,7 @@ namespace Articulate.Controllers
         [Route("/bluegreen-check")]
         public string[] BlueGreenCheck([FromServices]IOptionsSnapshot<CloudFoundryApplicationOptions> options)
         {
-            return new string[]
+            return new []
             {
                 options.Value.Application_Name, 
                 options.Value.InstanceIndex.ToString()
