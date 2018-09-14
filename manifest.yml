@@ -1,0 +1,10 @@
+---
+applications:
+- name: attendees
+  memory: 768M
+  instances: 1
+  random-route: true
+  path: publish/
+  services: []
+  env:
+    SKIP_SSL_VALIDATION: "true"

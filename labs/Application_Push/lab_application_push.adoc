@@ -1,0 +1,190 @@
+= Push the demo application
+:toc: right
+:imagesdir: ../images
+
+[abstract]
+--
+The prime directive of Pivotal Cloud Foundry is to host applications. We are going to exercise that directive by pushing a very simple Spring application.
+
+By the end of this lab you should have your attendees application up and running in your account.
+--
+
+Estimated Time: 30 minutes
+
+== Set your target environment
+
+. If you haven't already, download the latest release of the Cloud Foundry CLI from https://github.com/cloudfoundry/cli/releases for your operating system and install it.
+
+. Set the API target for the CLI:
++
+----
+$ cf api --skip-ssl-validation https://api.<DOMAIN_PROVIDED_BY_INSTRUCTOR>
+----
+
+. Login to Pivotal Cloud Foundry:
++
+----
+$ cf login
+----
++
+Follow the prompts, entering in the student credentials provided by the instructor and choosing the development space.
+
+== Build (or Download) and Push!
+
+Change to the _attendees_ sample application directory:
+----
+$ cd $COURSE_HOME
+----
+
+=== Download
+
+If you cannot run the maven script to build:
+
+. Download the attendees1-0.0.1-SNAPSHOT.jar file https://bintray.com/mborges-pivotal/generic/attendees1/head#files[here]
+. Create the directory `/build/libs/`.
+. Place the .jar file in the `/build/libs/` directory.
+. Skip down to the 'Push' section.
+
+=== Build
+
+Use the Maven Wrapper to build and package the application:
+
+----
+$ ./mvnw package -DskipTests
+----
+
+The Maven Wrapper will automatically download the appropriate version of Maven for this project along with all of _attendees_'s dependencies. This may take a few moments.
+
+=== Push
+
+Now use the `cf push` command to push the application to PCF!
+
+----
+$ cf push
+----
+
+You should see output similar to the following listing. Take a look at the listing callouts for a play-by-play of what's happening:
+
+====
+----
+Using manifest file /Users/mborges/Tools/PCF/demo2.0/attendees/manifest.yml // <1>
+
+Creating app attendees in org pivot-mborges / space development as mborges@pivotal.io... // <2>
+OK
+
+Creating route attendees-naturopathic-souple.cfapps.pez.pivotal.io... // <3>
+OK
+
+Binding attendees-naturopathic-souple.cfapps.pez.pivotal.io to attendees... // <4>
+OK
+
+Uploading attendees...
+Uploading app files from: /var/folders/k6/bg1q4mc50sl957cvyfw0s26r0000gp/T/unzipped-app942168724
+Uploading 678.4K, 143 files // <5>
+Done uploading
+OK
+
+Starting app attendees in org pivot-mborges / space development as mborges@pivotal.io...
+Downloading python_buildpack...
+Downloading staticfile_buildpack...
+Downloading php_buildpack...
+Downloading java_buildpack_offline_v4...
+Downloading hwc_buildpack...
+Downloaded java_buildpack_offline_v4
+Downloading java_buildpack_offline...
+Downloaded hwc_buildpack
+Downloading ruby_buildpack...
+Downloaded php_buildpack
+Downloading nodejs_buildpack...
+Downloaded python_buildpack
+Downloaded staticfile_buildpack
+Downloading go_buildpack...
+Downloading null_buildpack...
+Downloaded go_buildpack
+Downloading binary_buildpack...
+Downloaded java_buildpack_offline
+Downloading dotnet_core_buildpack...
+Downloaded ruby_buildpack
+Downloading tc_server_buildpack_offline...
+Downloaded null_buildpack
+Downloading azq_nodejs...
+Downloaded nodejs_buildpack
+Downloaded binary_buildpack
+Downloaded dotnet_core_buildpack
+Downloaded tc_server_buildpack_offline
+Downloaded azq_nodejs
+Creating container
+Successfully created container
+Downloading app package...
+Downloaded app package (34.4M)
+Staging... // <6>
+-----> Java Buildpack Version: v3.18 (offline) | https://github.com/cloudfoundry/java-buildpack.git#841ecb2
+-----> Downloading Open Jdk JRE 1.8.0_131 from https://java-buildpack.cloudfoundry. org/openjdk/trusty/x86_64/openjdk-1.8.0_131.tar.gz (found in cache) // <7>
+       Expanding Open Jdk JRE to .java-buildpack/open_jdk_jre (1.3s)
+-----> Downloading Open JDK Like Memory Calculator 2.0.2_RELEASE from https://java-buildpack.cloudfoundry.org/memory-calculator/trusty/x86_64/memory-calculator-2.0.2_RELEASE.tar.gz (found in cache)
+       Memory Settings: -Xss349K -Xmx681574K -XX:MaxMetaspaceSize=104857K -Xms681574K -XX:MetaspaceSize=104857K
+-----> Downloading Container Security Provider 1.5.0_RELEASE from https://java-buildpack.cloudfoundry.org/container-security-provider/container-security-provider-1.5.0_RELEASE.jar (found in cache)
+-----> Downloading Spring Auto Reconfiguration 1.11.0_RELEASE from https://java-buildpack.cloudfoundry.org/auto-reconfiguration/auto-reconfiguration-1.11.0_RELEASE.jar (found in cache)
+Exit status 0
+Staging complete
+Uploading droplet, build artifacts cache... // <8>
+Uploading build artifacts cache...
+Uploading droplet...
+Uploaded build artifacts cache (107B)
+Uploaded droplet (79.9M)
+Uploading complete
+Destroying container
+Successfully destroyed container
+
+0 of 1 instances running, 1 starting
+0 of 1 instances running, 1 starting
+0 of 1 instances running, 1 starting
+1 of 1 instances running
+
+App started
+
+
+OK
+
+App attendees was started using this command `CALCULATED_MEMORY=$($PWD/.java-buildpack/open_jdk_jre/bin/java-buildpack-memory-calculator-2.0.2_RELEASE -memorySizes=metaspace:64m..,stack:228k.. -memoryWeights=heap:65,metaspace:10,native:15,stack:10 -memoryInitials=heap:100%,metaspace:100% -stackThreads=300 -totMemory=$MEMORY_LIMIT) && JAVA_OPTS="-Djava.io.tmpdir=$TMPDIR -XX:OnOutOfMemoryError=$PWD/.java-buildpack/open_jdk_jre/bin/killjava.sh $CALCULATED_MEMORY -Djava.ext.dirs=$PWD/.java-buildpack/container_security_provider:$PWD/.java-buildpack/open_jdk_jre/lib/ext -Djava.security.properties=$PWD/.java-buildpack/security_providers/java.security" && SERVER_PORT=$PORT eval exec $PWD/.java-buildpack/open_jdk_jre/bin/java $JAVA_OPTS -cp $PWD/. org.springframework.boot.loader.JarLauncher` // <9>
+
+Showing health and status for app attendees in org pivot-mborges / space development as mborges@pivotal.io...
+OK
+
+requested state: started
+instances: 1/1
+usage: 1G x 1 instances
+urls: attendees-naturopathic-souple.cfapps.pez.pivotal.io
+last uploaded: Mon Aug 7 21:47:10 UTC 2017
+stack: cflinuxfs2
+buildpack: container-security-provider=1.5.0_RELEASE java-buildpack=v3.18-offline-https://github.com/cloudfoundry/java-buildpack.git#841ecb2 java-main open-jdk-like-jre=1.8.0_131 open-jdk-like-memory-calculator=2.0.2_RELEASE open-jdk-like-security-providers secur...
+
+     state     since                    cpu      memory         disk           details
+#0   running   2017-08-07 04:48:08 PM   231.0%   498.1M of 1G   161.9M of 1G // <10>
+----
+
+<1> The CLI is using a manifest to provide necessary configuration details such as application name, memory to be allocated, and path to the application artifact.
+Take a look at `manifest.yml` to see how.
+<2> In most cases, the CLI indicates each Cloud Foundry API call as it happens.
+In this case, the CLI has created an application record for _attendees_ in your assigned space.
+<3> All HTTP/HTTPS requests to applications will flow through Cloud Foundry's front-end router called http://docs.cloudfoundry.org/concepts/architecture/router.html[(Go)Router].
+Here the CLI is creating a route with random word tokens inserted (again, see `manifest.yml` for a hint!) to prevent route collisions across the default PCF domain.
+<4> Now the CLI is _binding_ the created route to the application.
+Routes can actually be bound to multiple applications to support techniques such as http://www.mattstine.com/2013/07/10/blue-green-deployments-on-cloudfoundry[blue-green deployments].
+<5> The CLI finally uploads the application bits to PCF. Notice that it's uploading _90 files_! This is because Cloud Foundry actually explodes a ZIP artifact before uploading it for caching purposes.
+<6> Now we begin the staging process. The https://github.com/cloudfoundry/java-buildpack[Java Buildpack] is responsible for assembling the runtime components necessary to run the application.
+<7> Here we see the version of the JRE that has been chosen and installed.
+<8> The complete package of your application and all of its necessary runtime components is called a _droplet_.
+Here the droplet is being uploaded to PCF's internal blobstore so that it can be easily copied to one or more _http://docs.cloudfoundry.org/concepts/diego/diego-components.html#cell-components[Diego Cells]_ for execution.
+<9> The CLI tells you exactly what command and argument set was used to start your application.
+<10> Finally the CLI reports the current status of your application's health.
+You can get the same output at any time by typing `cf app attendees`.
+====
+
+Visit the application in your browser by hitting the route that was generated by the CLI.  You can find the route by typing `cf apps`, and it will look something like `https://attendees-naturopathic-souple.<DOMAIN-PROVIDED-BY-INSTRUCTOR>`
+
+image::screenshot_main.png[]
+
+Take a look at the `Application Environment Information` section on the top right-hand corner of the UI.
+This gives you important information about the state of the currently running _attendees_ instance, including what application instance index and what Cloud Foundry services are bound.
+It will become important in the next lab!

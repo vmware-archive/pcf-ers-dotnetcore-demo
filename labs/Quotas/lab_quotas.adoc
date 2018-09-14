@@ -1,0 +1,284 @@
+:compat-mode:
+= Quotas
+:toc: right
+:imagesdir: ../images
+
+
+
+[abstract]
+--
+How to control usage in your Pivotal Cloud Foundry orgs and spaces using quotas
+--
+
+Estimated Time: 25 minutes
+
+== Requirements
+
+[Lab Requirements](../requirements)
+
+== Explore Existing Quotas
+
+. Review http://docs.pivotal.io/pivotalcf/adminguide/quota-plans.html[Creating and Modifying Quota Plans].
+
+. View available quota plans.
++
+----
+$ cf quotas
+----
++
+. View the assigned quotas for the org.
+
+For example:
+
+----
+$ cf org my-org
+----
+
+== Create and Set an Org Quota
+
+. Create a new quota for your organization.
++
+Create a quota with the following:
++
+|===
+| Field        | Value
+
+| Quota Name  | (initials)-quota
+| Total Memory | 2G
+| Instance Memory | 2G
+| Routes | 2
+| Service Instances | 2
+| App Instances | unlimited
+| Allow Paid Service Plans | true
+|===
++
+For example:
++
+----
+$ cf create-quota dnr-quota -m 2G -i 2G -r 2 -s 2 --allow-paid-service-plans
+----
++
+. Assign the quota.
++
+For example:
++
+----
+$ cf set-quota dnr-org dnr-quota
+----
++
+. Confirm the quota assignment.
+
+For example:
+----
+$ cf org dnr-org
+----
+
+== Create a New Space
+
+1) Log in as the `OrgManager` user (john.q.manager@pivotal.io) created in the [previous lab](../orgs-spaces-roles).
+----
+$ cf login
+----
+
+2) Create a staging space.
+
+----
+$ cf create-space staging
+----
+
+3) Give your `SpaceDeveloper` (john.q.developer@pivotal.io) access to the `staging` space.
+
+For example:
+----
+$ cf set-space-role john.q.developer@pivotal.io dnr-org staging SpaceDeveloper
+----
+
+
+
+== Simulate Developer Usage
+
+1) Log in as the `SpaceDeveloper` (john.q.developer@pivotal.io) you created in the [previous lab](../orgs-spaces-roles).  Target the `dev` space.
+
+----
+$ cf login
+----
+
+2) Simulate excessive usage by a developer.
+
+Create multiple service instances of the `app-autoscaler`.
+
+----
+$ cf create-service app-autoscaler bronze a1
+$ cf create-service app-autoscaler bronze a2
+$ cf create-service app-autoscaler bronze a3
+----
+
+3) Target the `staging` space.
+
+----
+$ cf target -s staging
+----
+
+4) Create an `app-autoscaler` instance for the `staging` space.
+
+----
+$ cf create-service app-autoscaler bronze a1
+----
+
+## Questions
+
+* When targeting the `dev` space, creating the third service instance (`a3`) should have failed.  Why?
+* When targeting the `staging` space, creating the first service instance(`a1`) should have failed.  Why?
+* When an `org` contains multiple `spaces` how can one prohibit a single space from using all the quota?
+
+== Be a Good Citizen
+
+1) Target the `dev` space.
+
+----
+$ cf target -s dev
+----
+
+2) Delete the second `app-autoscaler` instance.
+
+----
+$ cf delete-service a2
+----
+
+
+== Create and Set a Space Quota
+
+1) Log in as the `OrgManager` user (john.q.manager@pivotal.io) created in the [previous lab](../orgs-spaces-roles).  Target the `dev` space.
+
+----
+$ cf login
+----
+2) Create a space quota.
+
+Create a space quota with the following:
+
+| Field        | Value           |
+| :------------- |:-------------|
+| Quota Name  | (initials)-space-quota  |
+| Total Memory | 1G  |
+| Instance Memory | 1G  |
+| Routes | 1  |
+| Service Instances | 1  |
+| App Instances | unlimited  |
+| Allow Paid Service Plans | true  |
+
+For example:
+----
+$ cf create-space-quota dnr-space-quota -m 1G -i 1G -r 1 -s 1 --allow-paid-service-plans
+----
+
+3) Assign the space quota to your spaces.
+
+For Example:
+----
+$ cf set-space-quota dev dnr-space-quota
+$ cf set-space-quota staging dnr-space-quota
+----
+
+4) Confirm the quotas are set up accordingly.
+
+For Example:
+----
+$ cf org dnr-org
+$ cf space dev
+$ cf space staging
+----
+
+== Simulate Developer Usage
+
+1) Log in as the `SpaceDeveloper` (john.q.developer@pivotal.io) you created in the [previous lab](../orgs-spaces-roles).  Target the `dev` space.
+
+----
+$ cf login
+----
+
+2) Simulate excessive usage by a developer again.
+
+Create a second service instance of the `app-autoscaler`.
+
+----
+$ cf create-service app-autoscaler bronze a2
+----
+
+***What happened?***
+
+The second service instance was not created because the space quota limit is now one service instance. This protects the `org` from being overrun by any single space.
+
+3) Target `staging`.
+
+----
+$ cf target -s staging
+----
+
+4) Create an `app-autoscaler` service instance in the `staging` space.
+
+----
+$ cf create-service app-autoscaler bronze a1
+----
+## Questions
+
+* What would happen if you were to change your space quota to allow ten service instances?
+* What command would you use to update the `default` quota?
+
+== Cleanup
+
+1) Delete the `app-autoscaler` service instance.
+
+----
+$ cf delete-service a1
+----
+
+2) Target the `dev` space.
+
+----
+$ cf target -s dev
+----
+
+3) Delete the `app-autoscaler` service instance.
+
+----
+$ cf delete-service a1
+----
+
+4) Login as `admin`.
+
+----
+$ cf login
+----
+
+5) Reset your org quota to match the `default` quota.  For example:
+
+----
+$ cf update-quota dnr-quota -m 10G -i -1 -r 1000 -s 100
+----
+
+6) Check that the org quota has been updated by running the `cf org` command.
+
+----
+$ cf org dnr-org
+----
+
+6) Update the `YOUR-INITIALS-space-quota` so its memory, route, and service limits are set to half of those allowed in `YOUR-INITIALS-quota`. For example:
+
+----
+$ cf update-space-quota dnr-space-quota -m 5G -i -1 -r 500 -s 50
+----
+
+7) Ensure that the space quotas have been updated by running the `cf space` command.
+
+----
+$ cf space dev
+----
+
+----
+$ cf space staging
+----
+
+
+
+**Congratulations!** You've completed the quotas lab.

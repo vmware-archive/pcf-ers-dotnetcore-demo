@@ -1,0 +1,163 @@
+:compat-mode:
+= Logging, Scale and HA
+:toc: right
+:imagesdir: ../images
+
+
+
+[abstract]
+--
+How PCF facilitates application management, including: access application 
+logs, scale an application, access events and handle failed application 
+instances
+--
+
+Estimated Time: 30 minutes
+
+== Access Application Logs
+
+Review the documentation on http://docs.pivotal.io/pivotalcf/1-11/devguide/deploy-apps/streaming-logs.html[application logs].
+
+You can tail the logs:
+----
+$ cf logs attendees
+----
+
+Then open a browser and view the _attendees_ application. 
+
+image::screenshot_main.png[]
+
+Observe the log output when the _attendees_ web page is refreshed. 
+More logs are added!
+
+To stop tailing logs, go to the terminal tailing the logs and send an
+interrupt (Control + c).
+
+=== Questions
+* Where should your application write logs?
+* What are some of the different origin codes seen in the log?
+* How does this change how you access logs today? At scale?
+
+== Access _attendees_ events
+Events for the application can also be used to compliment the logs in determining what has occurred with an application.
+----
+$ cf events attendees
+----
+
+== Scale _attendees_
+=== Scale Up
+. Start tailing the logs again.
++
+----
+[mac, linux]
+$ cf logs attendees | grep "API\|CELL"
+
+[windows]
+$ cf logs attendees | findstr "API CELL"
+----
++
+The above statement filters only matching log lines from the Cloud Controller 
+and Cell components.
++
+. In another terminal window scale attendees. 
+----
+$ cf scale attendees -m 1G
+----
+. Observe log output.
+. Stop tailing the logs.
+. Scale attendees back to our original settings.
+----
+$ cf scale attendees -m 768M
+----
+=== Scale Out
+. Browse to the _Scale and HA_ page on the _attendees_ application.
++
+image::screenshot_scaleAndHA.png[]
++
+Review the _Application Environment Information_. 
++
+. Press the `Refresh` button multiple times. All requests are going to one application instance.
+. Start tailing the logs.
++
+----
+[mac, linux]
+$ cf logs attendees | grep "API\|CELL"
+
+[windows]
+$ cf logs attendees | findstr "API CELL"
+----
++
+. In another terminal windows, scale _attendees_ application.
++
+----
+$ cf scale attendees -i 3
+----
++
+. Observe log output. Then stop tailing the logs.
+. Return to `attendees` in a web browser. Press the `Refresh` button several times. Observe the `Addresses` 
+and `Instance Index` changing.
++
+_Notice how quickly the new application instances are provisioned and subsequently load balanced!_
+
+=== Questions
+
+* How long does it take to scale up or out applications now?
+
+
+== High Availability
+Pivotal Cloud Foundry has https://content.pivotal.io/blog/the-four-levels-of-ha-in-pivotal-cf[4 levels of HA] (High Availability) that keep your applications and the underlying platform running. In this section, we will demonstrate one of them. Failed application instances will be recovered.
++
+. At this time you should be running multiple instances of `attendees`. Confirm this with the following command:
+----
+$ cf app attendees
+----
+. Return to `attendees` in a web browser and navigate to the Scale and HA page. Press the Refresh button. Confirm the application is running.
+. Kill the app. Press the Kill button!
+. Check the state of the app through the cf CLI.
+----
+$ cf app articulate
+----
+Sample output below (notice the requested state vs actual state). In this case, Pivotal Cloud Foundry had already detected the failure and is starting a new instance.
+----
+Showing health and status for app attendees in org mborges-org / space development as admin...
+
+name:              attendees
+requested state:   started
+instances:         3/3
+usage:             768M x 3 instances
+routes:            attendees-doxastic-progenitiveness.apps.pcf.homelab.lan
+last uploaded:     Wed 09 Aug 17:18:22 CDT 2017
+stack:             cflinuxfs2
+buildpack:         container-security-provider=1.5.0_RELEASE
+                   java-buildpack=v3.18-offline-https://github.com/cloudfoundry/java-buildpack.git#841ecb2 java-main
+                   open-jdk-like-jre=1.8.0_131 open-jdk-like-memory-calculator=2.0.2_RELEASE
+                   open-jdk-like-security-providers secur...
+
+     state      since                  cpu    memory           disk           details
+#0   starting   2017-08-10T00:31:23Z   0.0%   272.3M of 768M   161.9M of 1G
+#1   running    2017-08-10T00:30:24Z   6.3%   401.1M of 768M   161.9M of 1G
+#2   running    2017-08-10T00:30:32Z   2.1%   408.8M of 768M   161.9M of 1G
+----
+Repeat this command as necessary until `state = running`.
+. In your browser, Refresh the articulate application.
+The app is back up!
+
+A new, healthy app instance has been automatically provisioned to replace the failing one.
+
+. View which instance was killed.
+----
+$ cf events articulate
+----
+. Scale articulate back to our original settings.
+----
+$ cf scale articulate -i 1
+----
+
+=== Questions
+* How do you recover failing application instances today?
+* What effect does this have on your application design?
+* How could you determine if your application has been crashing?
+
+== Beyond the class
+Try the same exercises, but using Apps Manager instead
+

@@ -2,6 +2,7 @@ git.properties
 
 **/target/
 .DS_Store
+**/publish/
 
 ### STS ###
 .apt_generated

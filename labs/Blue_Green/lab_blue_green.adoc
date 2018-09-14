@@ -1,0 +1,173 @@
+:compat-mode:
+= Blue Green Deployment
+:toc: right
+:imagesdir: ../images
+
+
+
+[abstract]
+--
+You'll learn how to manage application upgrades with a blue-green deployment
+--
+
+Estimated Time: 25 minutes
+
+== Setup
+
+. To simulate a blue-green deployment, first scale `attendees` to multiple instances.
+
+----
+$ cf scale attendees -i 2
+----
+
+== Perform a Blue-Green Deployment
+. Read about using Blue-Green Deployments to reduce downtime and risk.
+. Browse to the attendees Blue-Green page.
++
+image::blue_green1.png[]
++
+. Lets assume that the deployed application is version 1. Let's generate some traffic. Press the `Start` button.
++
+_Leave this open as a dedicated tab in your browser. We will come back to this later._
++
+. Observe our existing application handling all the web requests.
++
+Start Load
++
+. Record the hostname for the attendees application.
++
+This is our production route. _You will use this in the next step._
++
+For example:
++
+----
+-> cf routes
+Getting routes for org mborges-org / space development as admin ...
+
+space         host                                 domain                 port   path   type   apps                     service
+development   attendees-doxastic-progenitiveness   apps.pcf.homelab.lan                        attendees
+----
+. Now let's `push` the next version of `attendees`.
++
+However, this time we will specify the hostname by appending `-temp` to our production route.
++
+For example (your hostname will be different):
++
+----
+$ cd ~/pcf-ers-demo/
+$ cf push attendees-v2 -p ./pcf-ers-demo1-0.0.1-SNAPSHOT.jar -m 768M -n attendees-doxastic-progenitiveness-temp --no-start
+----
++
+. Bind attendees-v2 to the attendee-service user provided service.
++
+----
+$ cf bind-service attendees-v2 attendee-service
+----
+_You can ignore the "TIP: Use 'cf restage attendees-v2' to ensure your env variable changes take effect" message at this time._
++
+. Start the application.
++
+----
+$ cf start attendees-v2
+----
++
+. Now we have two versions of our app deployed.
++
+Open a new tab and view version 2 of `attendees` in your browser. Take note of the application name.
++
+image::blue_green2.png[]
++
+At this point in the deployment process, you could do further testing of the version you are about to release before exposing customers to it.
++
+. Let's assume we are ready to start directing production traffic to version 2. We need to map our production route to `attendees-v2`.
++
+For example (your domain and hostname may be different):
++
+----
+$ cf map-route attendees-v2 apps.pcf.homelab.lan -n attendees-doxastic-progenitiveness
+----
++
+. Return to browser tab where you started the load. You should see that it is starting to send requests to version 2.
++
+image::blue_green3.png[]
++
+. Press the `Reset` button, so we can see how the load get distributed across app instances.
++
+If you are running with a similar configuration to this:
++
+----
+-> cf apps
+Getting apps in org mborges-org / space development as admin...
+OK
+
+name                     requested state   instances   memory   disk   urls
+attendees                started           2/2         768M     1G     ...
+attendees-v2             started           1/1         768M     1G     ...
+----
+You should see about a third of the requests going to version 2.
++
+image::blue_green4.png[]
++
+. Move more traffic to version 2.
++
+----
+$ cf scale attendees -i 1
+$ cf scale attendees-v2 -i 2
+----
++
+If you `Reset` the load generator, you will see 2/3 of the traffic go to `attendees-v2`.
+. Move all traffic to version 2.
++
+Remove the production route from the `attendees` application.
++
+For example (your domain and hostname may be different):
++
+----
+$ cf unmap-route attendees apps.pcf.homelab.lan -n attendees-doxastic-progenitiveness
+----
+If you `Reset` the load generator, you will see all the traffic goes to `attendees-v2`.
++
+image::blue_green5.png[]
++
+*_NOTE:_* Refreshing the entire page will update the application name.
++
+. Remove the temp route from the attendees-v2 application.
++
+For example (your domain and hostname may be different):
++
+----
+$ cf unmap-route attendees-v2 cfapps-01.haas-66.pez.pivotal.io -n attendees-heartsickening-elegance-temp
+----
+*Congratulations!* You performed a blue-green deployment.
+
+=== Questions
+* How would a rollback situation be handled using a blue-green deployment?
+* What other design implications does running at least two versions at the same time have on your applications?
+* Do you do blue-green deployments today? How is this different?
+
+== Cleanup
+Let's reset our environment.
+
+. Delete the attendees application.
++
+----
+$ cf delete attendees
+----
++
+. Rename attendees-v2 to attendees.
++
+----
+$ cf rename attendees-v2 attendees
+----
++
+. Restart attendees.
++
+----
+$ cf restart attendees
+----
++
+. Scale down.
++
+----
+$ cf scale attendees -i 1
+----
