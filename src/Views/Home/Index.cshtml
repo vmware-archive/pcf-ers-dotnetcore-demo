@@ -1,0 +1,50 @@
+﻿@using Articulate.Models
+@model Articulate.Models.AppEnv
+<div class="container" role="main">
+
+	<span id="tutorialName" style="display: none;">index</span>
+		
+	<div class="page-header">
+		<p>&nbsp;</p>
+		<h1>Welcome to the Cloud Foundry Basic Demo!</h1>
+	</div>
+
+	<div class="row ">
+		
+		<div class="col-md-6">
+			<p>The purpose of this application is to demonstrate some basic
+				capabilities of the Pivotal Cloud Foundry Platform, in particular
+				the Pivotal Application Service which is the core component
+				responsible for running the application workloads as containers.</p>
+			<h3>How to use this Application</h3>
+			<p>
+				Each menu item above links to a page that helps demonstrate a set
+				of capabilities. Some of the features demonstrated use parts of 
+				<a href="https://steeltoe.io">project Steeltoe</a>
+				libraries which enhance DevOps experience when running on Cloud Foundry,
+				but it's use is not required to run apps on PCF. 
+			</p>
+			<p>Each page has the same layout with the Accordion control and
+				3 groups:</p>
+			<ol>
+				<li><b>Application Environment Information</b> - This provides
+					information about the application environment when running inside
+					PCF. You can see the Application Name, Container and Services
+					information. This is useful to show things like load balancing,
+					self healing, service binding among other things.</li>
+				<li><b>Description</b> - We provide information on the current
+					page and additional resources.</li>
+				<li><b>Demonstration</b> - We list the things that can be
+					demonstrated in the particular page.</li>
+			</ol>
+		</div>
+			
+		<div class="col-md-6">
+			@await Html.PartialAsync("Tutorial", (AppEnv)ViewBag.AppEnv)
+			@* <partial name="Shared/Tutorial.cshtml" model="ViewBag.AppEnv"/> *@
+		</div>
+
+	</div>
+
+
+</div>

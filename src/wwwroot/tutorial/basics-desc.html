@@ -1,0 +1,38 @@
+<p>
+	Pivotal Cloud Foundry Application Services is the core platform service
+	responsible for running application as containers. The services runs
+	applications written in different languages and frameworks. The
+	container runtime engine provides container image construction, load
+	distribution, access management, high availability, health monitoring
+	among many other services.<a
+		href="http://docs.pivotal.io/pivotalcf/concepts/index.html"
+		target="_blank">&nbsp;Learn more.</a>
+</p>
+<p>PCF Application Services, as a distribute system, is composed of many
+	microservices that work together to provide platform capabilities.</p>
+
+<img src="/images/basics1.png"
+	class="img-rounded img-responsive center-block" alt="Cinque Terre"
+	width="600" height="200">
+
+<p>In the diagram above we have depicted some core component of the
+	PCF Application Services.</p>
+<ul>
+	<li><b>Router</b> - Entry point to the platform.</li>
+	<li><b>Cloud Controller</b> - Handle the platform API calls. E.g
+		scale, apps, push.</li>
+	<li><b>Blob Store</b> - Where container images, or droplets, are
+		stored.</li>
+	<li><b>Metadata Store</b> - Information about deployed
+		applications and configured services.</li>
+</ul>
+<p>
+	Then we have <b>Runtime VMs</b> which are a pool of VMs responsible for
+	managing the application container workload. In this diagram we have 3
+	applications each with its own route (URL) and number of instances.
+	We'll see that the <b>router</b> load balances application requests to
+	a route to the group of application instances associated with the
+	route. <a
+		href="http://docs.pivotal.io/pivotalcf/devguide/deploy-apps/routes-domains.html"
+		target="_blank">&nbsp;Learn more about Routes and Domains.</a>
+</p>

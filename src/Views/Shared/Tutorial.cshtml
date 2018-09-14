@@ -1,0 +1,88 @@
+﻿@using Articulate.Models
+@model Articulate.Models.AppEnv
+<div th:fragment="tutorial" id="accordion" class="panel-group">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion"
+                       href="#collapseZero">
+                        Application Environment Information
+                    </a>
+                </h4>
+            </div>
+            <div id="collapseZero" class="panel-collapse collapse in">
+                <div class="panel-body">
+                    <p>
+                        <b>Application Name:</b>&nbsp;
+                        <span>@(Model.App.Application_Name ?? "no name environment variable")</span>
+                        @* <span *@
+                        @*     th:text="*{applicationName}?: 'running locally'"> *@
+                        @* </span> *@
+                    </p>
+                    <p>
+                        <b>Instance Index:</b>&nbsp;
+                        <span>@(Model.App.Instance_Index >= 0 ? Model.App.Instance_Index.ToString() : "no index environment variable")</span>
+                        @* <span id="instanceIndex" *@
+                        @*       th:text="${instanceIndex}"> *@
+                        @* </span> *@
+                    </p>
+                    <p>
+                        <b>Container Address:</b>&nbsp;
+                        <span id="containerAddr">@Model.ContainerAddr</span>
+                    </p>
+                    <p>
+                        <b>Cell Address:</b>&nbsp;
+                        <span id="instanceAddress">@Model.InstanceAddr</span>
+                    </p>
+                    <p>
+                        <b>.NET Core CLR Version:</b>&nbsp;
+                        <span id="clrVersion">@Model.ClrVersion</span>
+                    </p>
+                    <hr></hr>
+                    <h4>Services</h4>
+                    @if(!Model.Services.ServicesList.Any())
+                    {<span>None</span>}
+                    @foreach (var service in Model.Services.ServicesList)
+                    {
+                        <p>
+                            <b><span>@service.Label</span></b>:&nbsp;
+                            <span>@service.Name</span>
+                        </p>
+                    }
+                    
+                    <div id="resultsBlock-health"></div>
+                    <div id="resultsBlock-info"></div>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion"
+                       href="#collapseOne">
+                        1. Description
+                    </a>
+                </h4>
+            </div>
+            <div id="collapseOne" class="panel-collapse collapse">
+                <div id="description" class="panel-body">
+                    <p>DESCRIPTION NOT AVAILABLE</p>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion"
+                       href="#collapseTwo">
+                        2. Demonstrations
+                    </a>
+                </h4>
+            </div>
+            <div id="collapseTwo" class="panel-collapse collapse">
+                <div id="demonstration" class="panel-body">
+                    <p>DEMONSTRATION NOT AVAILABLE</p>
+                </div>
+            </div>
+        </div>
+    </div>

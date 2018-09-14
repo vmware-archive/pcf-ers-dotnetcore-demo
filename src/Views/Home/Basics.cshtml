@@ -1,0 +1,95 @@
+﻿@using Articulate.Models
+
+<div class="container" role="main">
+
+	<span id="tutorialName" style="display: none;">basics</span>
+
+	<div class="page-header">
+		<p>&nbsp;</p>
+		<h1>Scale &amp; High Availability</h1>
+	</div>
+
+	<div class="row">
+		<div class="col-md-12">
+			<p>Ok, you have the application running. Now let's understand
+				some of the basic capabilities you get to every application in PCF.</p>
+		</div>
+
+	</div>
+
+	<div class="row">
+
+		<div class="col-md-6">
+			@if (!((bool?)ViewBag.Killed).GetValueOrDefault(false))
+			{
+				<div th:if="${killed} == null" class="panel panel-default">
+					<div class="panel-body">
+						<p th:if="${ssh_file}">Wrote/updated file <b><span th:text="${ssh_file}"></span></b>. SSH into the container to see.</p>
+						<p id="loadResults"></p>
+						<div class="alert alert-danger" role="alert">
+							<b>Attention!</b> Before clicking on <i><b>kill</b></i> you may
+							want to ensure you have at least 2 application instances (HA)
+							configured. Otherwise be ready to wait a minute or so until PCF
+							auto-recovers the application.
+						</div>
+						<p>The application instance and container showed is not the
+							one necessarily being killed (unless you have one instance, of
+							course). PCF will load balance the request, however, we designed
+							the application to return with the application information prior
+							to terminating itself.</p>
+					</div>
+					<div class="panel-footer clearfix">
+
+						<div class="pull-left">
+							<a id="loadButton" href="javascript:toggleTimer();"
+							   class="btn btn-default">Start Load Test</a>
+							<a href="/ssh-file"
+							   class="btn btn-default">Write File</a>
+						</div>
+
+						<div class="pull-right">
+							<a href="/basics" class="btn btn-default">Refresh</a>
+							<a
+								href="/basics?doit=true" class="btn btn-danger">Kill</a>
+						</div>
+					</div>
+				</div>
+			}
+			else
+			{
+				<div th:if="${killed}" class="panel panel-default">
+					<div class="panel-body">
+						<p>
+							You've clicked on the <i><b>Kill</b></i> button. If you're not
+							running on PCF you're probably dead.
+						</p>
+						<p>If running in PCF you can check the application instance
+							index that got the kill request below.</p>
+						<p>
+							If you have more than one application instance running, then you
+							can click <i>Refresh</i> and another application instance will
+							reply. Otherwise, wait till the application is automatically
+							re-started.
+						</p>
+						<p>Pivotal Apps Manager or the CF CLI can provide basic
+							application monitoring like events, logs and instance monitoring.
+						</p>
+					</div>
+					<div class="panel-footer clearfix">
+						<div class="pull-right">
+							<a href="/basics" class="btn btn-default">Refresh</a>
+						</div>
+					</div>
+				</div>
+			}
+		</div>
+
+		<div class="col-md-6">
+			@await Html.PartialAsync("Tutorial", (AppEnv)ViewBag.AppEnv)
+			@* <partial name="Shared/Tutorial.cshtml" model="ViewBag.AppEnv"/> *@
+		</div>
+
+	</div>
+
+
+</div>

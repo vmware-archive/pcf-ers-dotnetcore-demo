@@ -1,0 +1,31 @@
+<p>
+	Blue-Green deployment is an approach to upgrading application with
+	minimal downtime. <a
+		href="https://docs.pivotal.io/pivotalcf/devguide/deploy-apps/blue-green.html"
+		target="_blank">&nbsp;Learn more.</a>
+</p>
+<p>It also enables easy rollback to the old version if the new
+	version experience problems. It works by keeping both versions online,
+	and switching from the old version to the new version.</p>
+
+<img src="/images/bluegreen1.png"
+	class="img-rounded img-responsive center-block" alt="Cinque Terre"
+	width="600" height="200">
+
+<h4>Slowing turning on traffic using Instances</h4>
+
+<p>The idea is to direct traffic to the new version in a controlled
+	fashion to the point where you can retired the older version</p>
+<ul>
+	<li>Start with four instance of blue, one instance of green
+		<ul>
+			<li>80% of traffic will use version 1.0</li>
+		</ul>
+	</li>
+	<li>Decrease blue instance, increase green instances as confidence
+		builds</li>
+</ul>
+
+<img src="/images/bluegreen2.png"
+	class="img-rounded img-responsive center-block" alt="Cinque Terre"
+	width="600" height="200">
