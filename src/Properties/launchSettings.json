@@ -1,0 +1,29 @@
+{
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:65418/",
+      "sslPort": 0
+    }
+  },
+  "profiles": {
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "pcf-ers-dotnetcore-demo": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "VCAP_SERVICES": "{   \"p-service-registry\": [    {     \"binding_name\": null,     \"credentials\": {      \"access_token_uri\": \"https://p-spring-cloud-services.uaa.run.pcfone.io/oauth/token\",      \"client_id\": \"p-service-registry-55dc2abf-3e9d-4fa1-bb2c-69f2e0d5377b\",      \"client_secret\": \"83iMrJWhHL8c\",      \"uri\": \"https://eureka-2f2e2d1e-3662-4c6f-b47d-a978c772dfc5.apps.pcfone.io\"     },     \"instance_name\": \"eureka\",     \"label\": \"p-service-registry\",     \"name\": \"eureka\",     \"plan\": \"standard\",     \"provider\": null,     \"syslog_drain_url\": null,     \"tags\": [      \"eureka\",      \"discovery\",      \"registry\",      \"spring-cloud\"     ],     \"volume_mounts\": []    }   ]  }",
+        "VCAP_APPLICATION": "{   \"application_id\": \"a932cb3f-5dfe-48b2-92a9-05d2c3f67024\",   \"application_name\": \"ers1\",   \"application_uris\": [    \"ers1.apps.pcfone.io\"   ],   \"application_version\": \"ae5efd34-b3bc-478a-8af4-27122bac9efe\",   \"cf_api\": \"https://api.run.pcfone.io\",   \"limits\": {    \"disk\": 1024,    \"fds\": 16384,    \"mem\": 1024   },   \"name\": \"ers1\",   \"space_id\": \"c4ccc79f-32b5-48f7-a461-c1b6f02a2c17\",   \"space_name\": \"ers\",   \"uris\": [    \"ers1.apps.pcfone.io\"   ],   \"users\": null,   \"version\": \"ae5efd34-b3bc-478a-8af4-27122bac9efe\"  }",
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:65419/"
+    }
+  }
+}

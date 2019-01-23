@@ -24,7 +24,10 @@
 			{
 				<div th:if="${killed} == null" class="panel panel-default">
 					<div class="panel-body">
-						<p th:if="${ssh_file}">Wrote/updated file <b><span th:text="${ssh_file}"></span></b>. SSH into the container to see.</p>
+						@if (ViewBag.SSHFile != null)
+						{
+							<p>Wrote/updated file <b><span>ViewBag.SSHFile</span></b>. SSH into the container to see.</p>
+						}
 						<p id="loadResults"></p>
 						<div class="alert alert-danger" role="alert">
 							<b>Attention!</b> Before clicking on <i><b>kill</b></i> you may

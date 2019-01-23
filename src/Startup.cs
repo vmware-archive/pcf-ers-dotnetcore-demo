@@ -9,19 +9,27 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Pivotal.Discovery.Client;
 using Steeltoe.CloudFoundry.Connector;
 using Steeltoe.CloudFoundry.Connector.MySql.EFCore;
 using Steeltoe.CloudFoundry.Connector.Services;
 using Steeltoe.Extensions.Configuration.CloudFoundry;
 using Steeltoe.Management.CloudFoundry;
+using Steeltoe.Management.Tracing;
 
 namespace Articulate
 {
     public class Startup
     {
+        private bool _isMySqlServiceBound;
+        private bool _isEurekaBound;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            
+            _isMySqlServiceBound = Configuration.GetServiceInfos<MySqlServiceInfo>().Any();
+            _isEurekaBound = Configuration.GetServiceInfos<EurekaServiceInfo>().Any();
         }
 
       
@@ -34,25 +42,27 @@ namespace Articulate
         {
             services.ConfigureCloudFoundryOptions(Configuration);
             services.AddMvc();
+            services.AddSingleton(Configuration);
             services.AddCloudFoundryActuators(Configuration);
             services.AddScoped<AppEnv>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            bool isMySqlServiceBound = Configuration.GetServiceInfos<MySqlServiceInfo>().Any();
-            
+            services.AddDistributedTracing(Configuration);
             services.AddDbContext<AttendeeContext>(options =>
             {
-                if (isMySqlServiceBound)
+                if (_isMySqlServiceBound)
                     options.UseMySql(Configuration);
                 else
                     options.UseSqlite("DataSource=:memory:");
                 
-            }, isMySqlServiceBound ? ServiceLifetime.Scoped : ServiceLifetime.Singleton);
+            }, _isMySqlServiceBound ? ServiceLifetime.Scoped : ServiceLifetime.Singleton);
 
+            services.AddDiscoveryClient(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -68,6 +78,8 @@ namespace Articulate
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
             app.EnsureMigrationOfContext<AttendeeContext>();
+            
+            app.UseDiscoveryClient();
         }
         
     }

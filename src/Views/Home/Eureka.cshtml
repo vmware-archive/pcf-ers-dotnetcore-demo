@@ -1,0 +1,81 @@
+@using Articulate.Models
+@model List<Articulate.Models.DiscoveredService>
+
+<!--  PAGE BODY -->
+<div class="container" role="main">
+
+	<span id="tutorialName" style="display: none;">Service Discovery - Eureka</span>
+
+	<div class="page-header">
+		<p>&nbsp;</p>
+		<h1>Service Discovery - Eureka</h1>
+	</div>
+
+
+	<div class="row">
+		<div class="col-md-6">
+			<p>One of the key challanges with microservices is keep track of all the endpoints
+				and dynamically responding to availability of each. Eureka service based on Netflix OSS
+				stack helps us with this. View app in <a href="@ViewBag.MetricsUrl">PCF metrics</a>.</p>
+			<table class="table">
+				<thead>
+				<tr>
+					<th>Service Name</th>
+					<th>Url(s)</th>
+				</tr>
+				</thead>
+				<tbody>
+				@foreach (var service in Model)
+				{
+					<tr>
+						<td>@service.Name</td>
+						<td>
+							<ul>
+								@foreach (var url in service.Urls)
+								{
+									
+									<li>@url</li>
+								}
+							</ul>
+						</td>
+					</tr>
+				}
+				</tbody>
+			</table>
+			<h3>Distributed Tracing</h3>
+			<div id="request">
+				<div class="btn-group" role="group">
+					<button type="button" class="btn btn-default">@ViewBag.CFApp.Name<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></button>
+					@foreach (var service in Model.Where(x => x.Name != ViewBag.CFApp.Name))
+					{
+						<button name="target" type="button" class="btn btn-default" name="target" value="@service.Name">@service.Name<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></button>
+					}
+				</div>
+				
+				<button type="button" class="btn btn-success" onclick="javascript:Ping();">Execute</button>
+			</div>
+			<div id="response"></div>
+		</div>
+		<div class="col-md-6">
+			@await Html.PartialAsync("Tutorial", (AppEnv)ViewBag.AppEnv)
+		</div>
+	</div>
+	
+	<script>
+	    function Ping() {
+		    var val = "";
+		    $("button[name='target']").each(function(i, e) {
+			    
+			    val = val + $(e).val() + ",";
+		    });
+		    val = val.slice(0, -1);
+		    $.get("/ping/?targets=" + val, function(pong) {
+			    console.log(pong);
+			    $("#response").html("<pre>" + pong + "</pre>");
+		    });
+	    }
+	</script>
+
+	
+
+</div>

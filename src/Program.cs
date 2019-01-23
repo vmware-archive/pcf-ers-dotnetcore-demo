@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Steeltoe.Extensions.Configuration.CloudFoundry;
 using Steeltoe.Extensions.Logging;
@@ -17,6 +19,18 @@ namespace Articulate
             WebHost.CreateDefaultBuilder(args)
                 .UseCloudFoundryHosting()
                 .AddCloudFoundry()
+//                .ConfigureAppConfiguration(builder =>
+//                {
+//                    // set spring app name to be same as name on the platform
+//                    var config = builder.Build();
+//                    builder.AddCloudFoundry();
+//                    var options = new CloudFoundryApplicationOptions();
+//                    config.GetSection("vcap:application").Bind(options);
+//                    if (options.Name != null)
+//                    {
+//                        builder.AddInMemoryCollection(new Dictionary<string, string> {{"spring:application:name", options.Name}});
+//                    }
+//                })
                 .ConfigureLogging((builderContext, loggingBuilder) =>
                 {
                     loggingBuilder.AddConfiguration(builderContext.Configuration.GetSection("Logging"));
@@ -25,4 +39,6 @@ namespace Articulate
                 .UseStartup<Startup>()
                 .Build();
     }
+    
+    
 }

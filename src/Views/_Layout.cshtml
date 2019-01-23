@@ -87,7 +87,12 @@
                 <li>
                     <a href="bluegreen">Blue Green</a>
                 </li>
-                
+                @if (ViewBag.HasEurekaBinding)
+                {
+                    <li>
+                        <a href="eureka">Service Discovery</a>
+                    </li>
+                }
             </ul>
         </div>
         <!-- /.navbar-collapse -->
