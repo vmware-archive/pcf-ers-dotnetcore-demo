@@ -88,7 +88,7 @@ namespace Articulate.Controllers
             return View("Attendees", await _db.Attendees.ToListAsync());
         }
         [Route("/eureka")]
-        public async Task<IActionResult> ServiceDiscovery([FromServices]IDiscoveryClient discoveryClient)
+        public IActionResult ServiceDiscovery([FromServices]IDiscoveryClient discoveryClient)
         {
 
             var services = discoveryClient.Services
