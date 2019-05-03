@@ -1,4 +1,5 @@
-﻿using System.Data.Common;
+﻿using System;
+using System.Data.Common;
 using System.Linq;
 using Articulate.Models;
 using Articulate.Repositories;
@@ -9,12 +10,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Pivotal.Discovery.Client;
 using Steeltoe.CloudFoundry.Connector;
 using Steeltoe.CloudFoundry.Connector.MySql.EFCore;
 using Steeltoe.CloudFoundry.Connector.Services;
+using Steeltoe.Discovery.Client;
 using Steeltoe.Extensions.Configuration.CloudFoundry;
 using Steeltoe.Management.CloudFoundry;
+using Steeltoe.Management.Endpoint;
+using Steeltoe.Management.Endpoint.Env;
+using Steeltoe.Management.Hypermedia;
 using Steeltoe.Management.Tracing;
 
 namespace Articulate
@@ -22,14 +26,12 @@ namespace Articulate
     public class Startup
     {
         private bool _isMySqlServiceBound;
-        private bool _isEurekaBound;
 
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
             
             _isMySqlServiceBound = Configuration.GetServiceInfos<MySqlServiceInfo>().Any();
-            _isEurekaBound = Configuration.GetServiceInfos<EurekaServiceInfo>().Any();
         }
 
       
@@ -38,12 +40,14 @@ namespace Articulate
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.ConfigureCloudFoundryOptions(Configuration);
             services.AddMvc();
             services.AddSingleton(Configuration);
-            services.AddCloudFoundryActuators(Configuration);
+
+            services.AddCloudFoundryActuators(Configuration, MediaTypeVersion.V2, ActuatorContext.ActuatorAndCloudFoundry);
+            services.AddEnvActuator(Configuration);
             services.AddScoped<AppEnv>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddDistributedTracing(Configuration);
@@ -57,6 +61,7 @@ namespace Articulate
             }, _isMySqlServiceBound ? ServiceLifetime.Scoped : ServiceLifetime.Singleton);
 
             services.AddDiscoveryClient(Configuration);
+            return services.BuildServiceProvider(false);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -69,7 +74,8 @@ namespace Articulate
             }
 
             app.UseFileServer();
-            app.UseCloudFoundryActuators();
+            app.UseEnvActuator();
+            app.UseCloudFoundryActuators(MediaTypeVersion.V2,ActuatorContext.ActuatorAndCloudFoundry);
 
             app.UseMvc(routes =>
             {
