@@ -1,0 +1,6 @@
+{
+  "Secrets": {
+    "Username": "prod-username",
+    "Password":  "super-secret" 
+  }
+}

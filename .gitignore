@@ -3,6 +3,8 @@ git.properties
 **/target/
 .DS_Store
 **/publish/
+artifacts/**
+.tmp/**
 
 ### STS ###
 .apt_generated

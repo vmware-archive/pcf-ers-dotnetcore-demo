@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE HTML>
 <html>
 
-<head th:fragment="head">
+<head >
 
     <title>PCF Sample App</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -52,7 +52,7 @@
 <!-- Navigation -->
 <!-- ++++++++++ -->
 
-<nav th:fragment="navigation"
+<nav 
      class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container">
         <!-- Brand and toggle get grouped for better mobile display -->
@@ -106,14 +106,14 @@
 <!-- ++++++ -->
 <!-- FOOTER -->
 <!-- ++++++ -->
-<footer th:fragment="footer" class="footer">
+<footer  class="footer">
     <div class="container">
         <p class="text-muted">Provided to you by Pivotal!</p>
     </div>
 </footer>
 
 <!-- Scripts -->
-<script th:fragment="app-instance-script">
+<script >
     $(function() {
 
         var url = '/tutorial';

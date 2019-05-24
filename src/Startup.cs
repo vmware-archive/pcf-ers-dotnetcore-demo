@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Pivotal.Discovery.Client;
+using Steeltoe.Discovery.Client;
 using Steeltoe.CloudFoundry.Connector;
 using Steeltoe.CloudFoundry.Connector.MySql.EFCore;
 using Steeltoe.CloudFoundry.Connector.Services;
@@ -27,7 +27,6 @@ namespace Articulate
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            
             _isMySqlServiceBound = Configuration.GetServiceInfos<MySqlServiceInfo>().Any();
             _isEurekaBound = Configuration.GetServiceInfos<EurekaServiceInfo>().Any();
         }

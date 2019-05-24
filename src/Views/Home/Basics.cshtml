@@ -22,7 +22,7 @@
 		<div class="col-md-6">
 			@if (!((bool?)ViewBag.Killed).GetValueOrDefault(false))
 			{
-				<div th:if="${killed} == null" class="panel panel-default">
+				<div class="panel panel-default">
 					<div class="panel-body">
 						@if (ViewBag.SSHFile != null)
 						{
@@ -60,7 +60,7 @@
 			}
 			else
 			{
-				<div th:if="${killed}" class="panel panel-default">
+				<div class="panel panel-default">
 					<div class="panel-body">
 						<p>
 							You've clicked on the <i><b>Kill</b></i> button. If you're not
