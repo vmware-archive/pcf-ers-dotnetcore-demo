@@ -10,7 +10,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Pivotal.Discovery.Client;
 using Steeltoe.CloudFoundry.Connector;
 using Steeltoe.CloudFoundry.Connector.MySql.EFCore;
 using Steeltoe.CloudFoundry.Connector.Services;
