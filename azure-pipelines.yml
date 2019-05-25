@@ -10,7 +10,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- script: ./build.sh
+- script: ./build.sh Pack
   displayName: 'Build'
 - task: PublishPipelineArtifact@0
   inputs:
