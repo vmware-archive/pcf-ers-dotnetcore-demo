@@ -11,5 +11,10 @@ pool:
 
 steps:
 - script: ./build.sh
-  displayName: 'Run a one-line script'
+  displayName: 'Build'
+- task: PublishPipelineArtifact@0
+  inputs:
+    targetPath: $(Build.ArtifactStagingDirectory)
+    artifactName: drop
+  displayName: Publish artifacts
 
