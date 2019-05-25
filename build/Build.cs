@@ -4,6 +4,7 @@ using System.IO.Compression;
 using System.Linq;
 using Microsoft.Build.Tasks;
 using Nuke.Common;
+using Nuke.Common.BuildServers;
 using Nuke.Common.Execution;
 using Nuke.Common.Git;
 using Nuke.Common.ProjectModel;
@@ -40,7 +41,7 @@ class Build : NukeBuild
     [GitVersion] readonly GitVersion GitVersion;
 
     AbsolutePath SourceDirectory => RootDirectory / "src";
-    AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
+    AbsolutePath ArtifactsDirectory => (AbsolutePath)TeamServices.Instance?.ArtifactStagingDirectory ??  RootDirectory / "artifacts";
     AbsolutePath PublishDirectory => RootDirectory / "src" / "bin" / Configuration / "netcoreapp2.2" / "publish";
     string PackageZipName => $"articulate-{GitVersion.MajorMinorPatch}.zip";
     
