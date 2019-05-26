@@ -12,6 +12,8 @@ pool:
 steps:
 - script: ./build.sh Deploy
   displayName: 'Build'
+  env:
+    CfPassword: $(CfPassword)
 - task: PublishPipelineArtifact@0
   inputs:
     targetPath: $(Build.ArtifactStagingDirectory)
