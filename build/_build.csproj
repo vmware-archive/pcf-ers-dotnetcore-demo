@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nuke.Common" Version="0.20.0-alpha0022" />
+    <PackageReference Include="Nuke.Common" Version="0.20.0-alpha0023" />
     <PackageReference Include="GitVersion.CommandLine.DotNetCore" Version="4.0.1-beta1-49" />
     <PackageReference Include="Octokit" Version="0.32.0" />
   </ItemGroup>

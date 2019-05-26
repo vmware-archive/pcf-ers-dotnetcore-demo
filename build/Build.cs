@@ -121,18 +121,21 @@ class Build : NukeBuild
                 .SetPassword(CfPassword)
                 .SetApiEndpoint(CfApiEndpoint));
         });
-    Target CfPush => _ => _
+    Target Deploy => _ => _
         .DependsOn(CfLogin)
         .Requires(() => CfSpace, () => CfOrg)
         .Executes(async () =>
         {
             string appName = "ers1";
+            CloudFoundryCreateSpace(c => c
+                .SetOrg(CfOrg)
+                .SetSpace(CfSpace));
             CloudFoundryTarget(c => c
                 .SetSpace(CfSpace)
                 .SetOrg(CfOrg));
             CloudFoundryCreateService(c => c
                 .SetService("p-service-registry")
-                .SetPlan("standard")
+                .SetPlan(CfApiEndpoint.Contains("api.run.pivotal.io") ? "trial" : "standard")
                 .SetInstanceName("eureka"));
             CloudFoundryPush(c => c
                 .SetAppName(appName)
