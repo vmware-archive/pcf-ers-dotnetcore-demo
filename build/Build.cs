@@ -123,8 +123,10 @@ class Build : NukeBuild
                 .SetOrg(CfOrg)
                 .SetSpace(CfSpace));
         });
+    
     Target Deploy => _ => _
         .DependsOn(CfLogin)
+        .DependsOn(Pack)
         .Requires(() => CfSpace, () => CfOrg)
         .Executes(async () =>
         {
@@ -150,7 +152,6 @@ class Build : NukeBuild
             CloudFoundryRestart(c => c
                 .SetAppName(appName));
         });
-    
     
     
     Target Release => _ => _
