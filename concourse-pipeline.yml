@@ -1,33 +1,38 @@
 ---
+task-image: &task-image
+  platform: linux
+  image_resource:
+    type: docker-image
+    source: 
+        repository: macsux/dotnet
+        tag: 2.2-sdk
+        
 resources:
 - name: git-src
   type: git
   source:
     uri: https://github.com/macsux/pcf-ers-dotnetcore-demo.git
     branch: master
+
 jobs:
   - name: job
     public: true
     plan:
       - get: git-src
-      - task: simple-task
+      - task: Build
         config:
           inputs:
           - name: git-src
-          platform: linux
-          image_resource:
-            type: docker-image
-            source: { repository: mcr.microsoft.com/dotnet/core/sdk }
+          <<: *task-image
           run:
             dir: git-src
             path: ./build.sh
             args: ["Pack"]
-      - task: another task
+      - task: Push
         config:
           platform: linux
-          image_resource:
-            type: docker-image
-            source: { repository: mcr.microsoft.com/dotnet/core/sdk }
+          <<: *task-image
           run:
-            path: echo
-            args: ["Blah!"]
+            dir: git-src
+            path: ./build.sh
+            args: ["CfPush"]
