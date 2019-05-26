@@ -92,6 +92,8 @@ class Build : NukeBuild
     Target Publish => _ => _
         .Executes(() =>
         {
+            Logger.Info(GitVersion == null);
+            Logger.Info(GitVersion.NuGetVersionV2);
             DotNetPublish(s => s
                 .SetProject(Solution)
                 .SetConfiguration(Configuration)
@@ -113,7 +115,7 @@ class Build : NukeBuild
     Target CfLogin => _ => _
         .OnlyWhenStatic(() => !CfSkipLogin)
         .Requires(() => CfUsername, () => CfPassword, () => CfApiEndpoint)
-        
+        .Unlisted()
         .Executes(() =>
         {
             CloudFoundryLogin(c => c
@@ -124,9 +126,9 @@ class Build : NukeBuild
                 .SetSpace(CfSpace));
         });
     
-    Target Deploy => _ => _
+    Target DeployTask => _ => _
         .DependsOn(CfLogin)
-        .DependsOn(Pack)
+        .After(Pack)
         .Requires(() => CfSpace, () => CfOrg)
         .Executes(async () =>
         {
@@ -152,7 +154,10 @@ class Build : NukeBuild
             CloudFoundryRestart(c => c
                 .SetAppName(appName));
         });
-    
+
+    Target Deploy => _ => _
+        .Triggers(Pack)
+        .Triggers(Deploy);
     
     Target Release => _ => _
         .Description("Creates a GitHub release (or ammends existing) and uploads buildpack artifact")
