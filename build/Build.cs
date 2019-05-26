@@ -119,7 +119,9 @@ class Build : NukeBuild
             CloudFoundryLogin(c => c
                 .SetUsername(CfUsername)
                 .SetPassword(CfPassword)
-                .SetApiEndpoint(CfApiEndpoint));
+                .SetApiEndpoint(CfApiEndpoint)
+                .SetOrg(CfOrg)
+                .SetSpace(CfSpace));
         });
     Target Deploy => _ => _
         .DependsOn(CfLogin)
