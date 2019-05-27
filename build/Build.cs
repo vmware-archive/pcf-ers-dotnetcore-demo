@@ -57,7 +57,10 @@ class Build : NukeBuild
 
 
     AbsolutePath SourceDirectory => RootDirectory / "src";
-    AbsolutePath ArtifactsDirectory => (AbsolutePath)TeamServices.Instance?.ArtifactStagingDirectory ??  RootDirectory / "artifacts";
+    AbsolutePath ArtifactsDirectory => (AbsolutePath)TeamServices.Instance?.ArtifactStagingDirectory ??  
+                                       (FileExists((AbsolutePath)"/tmp/garden-init") ? 
+                                           RootDirectory / "../artifacts" : 
+                                           RootDirectory / "artifacts");
     AbsolutePath PublishDirectory => RootDirectory / "src" / "bin" / Configuration / "netcoreapp2.2" / "publish";
     string PackageZipName => $"articulate-{GitVersion.MajorMinorPatch}.zip";
     
@@ -157,7 +160,7 @@ class Build : NukeBuild
 
     Target Deploy => _ => _
         .Triggers(Pack)
-        .Triggers(Deploy);
+        .Triggers(DeployTask);
     
     Target Release => _ => _
         .Description("Creates a GitHub release (or ammends existing) and uploads buildpack artifact")

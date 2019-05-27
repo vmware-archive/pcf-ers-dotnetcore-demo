@@ -15,7 +15,7 @@ resources:
     branch: master
 
 jobs:
-  - name: job
+  - name: Build and Deploy
     public: true
     plan:
       - get: git-src
@@ -23,16 +23,34 @@ jobs:
         config:
           inputs:
           - name: git-src
+          outputs:
+          - name: artifacts
           <<: *task-image
           run:
             dir: git-src
             path: ./build.sh
             args: ["Pack"]
-      - task: Push
-        config:
-          platform: linux
-          <<: *task-image
-          run:
-            dir: git-src
-            path: ./build.sh
-            args: ["CfPush"]
+          params:
+            CfApiEndpoint: ((CfApiEndpoint))
+            CfUsername: ((CfUsername))
+            CfPassword: ((CfPassword))
+            CfOrg: ((CfOrg))
+            CfSpace: ((CfSpace))
+      # - task: Push
+      #   config:
+      #     inputs:
+      #     - name: git-src
+      #     - name: artifacts
+      #     <<: *task-image
+      #     run:
+      #       dir: git-src
+      #       path: ./build.sh
+      #       args: ["DeployTask","--host","Travis"]
+      #     params:
+      #       CfApiEndpoint: ((CfApiEndpoint))
+      #       CfUsername: ((CfUsername))
+      #       CfPassword: ((CfPassword))
+      #       CfOrg: ((CfOrg))
+      #       CfSpace: ((CfSpace))
+            # path: pwd
+            #args: ["../../../garden-init"]
