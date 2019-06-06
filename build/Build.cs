@@ -31,7 +31,7 @@ class Build : NukeBuild
     ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
     ///   - Microsoft VSCode           https://nuke.build/vscode
 
-    public static int Main () => Execute<Build>(x => x.Compile);
+    public static int Main () => Execute<Build>();
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
@@ -51,6 +51,8 @@ class Build : NukeBuild
     readonly string CfOrg;
     [Parameter("Cloud Foundry Space")]
     readonly string CfSpace;
+    [Parameter("Number of apps (for distributed tracing)")]
+    readonly int AppsCount;
 
     [Parameter("Skip logging in Cloud Foundry and use the current logged in session")] 
     readonly bool CfSkipLogin;
@@ -133,9 +135,13 @@ class Build : NukeBuild
         .DependsOn(CfLogin)
         .After(Pack)
         .Requires(() => CfSpace, () => CfOrg)
+        .Unlisted()
+        .Description("Deploys to cloud Foundry without building. Meant to be used on build servers as part of stage")
         .Executes(async () =>
         {
             string appName = "ers1";
+            
+            var names = Enumerable.Range(1, AppsCount).Select(x => $"ers{x}").ToArray();;
             CloudFoundryCreateSpace(c => c
                 .SetOrg(CfOrg)
                 .SetSpace(CfSpace));
@@ -147,19 +153,21 @@ class Build : NukeBuild
                 .SetPlan(CfApiEndpoint.Contains("api.run.pivotal.io") ? "trial" : "standard")
                 .SetInstanceName("eureka"));
             CloudFoundryPush(c => c
-                .SetAppName(appName)
                 .SetRandomRoute(true)
-                .SetPath(ArtifactsDirectory / PackageZipName));
+                .SetPath(ArtifactsDirectory / PackageZipName)
+                .CombineWith(names,(cs,v) => cs.SetAppName(v)), degreeOfParallelism: 1);
             await CloudFoundryEnsureServiceReady("eureka");
             CloudFoundryBindService(c => c
-                .SetAppName(appName)
-                .SetServiceInstance("eureka"));
+                .SetServiceInstance("eureka")
+                .CombineWith(names,(cs,v) => cs.SetAppName(v)), degreeOfParallelism: 5);
             CloudFoundryRestart(c => c
-                .SetAppName(appName));
+                .SetAppName(appName)
+                .CombineWith(names,(cs,v) => cs.SetAppName(v)), degreeOfParallelism: 5);
         });
 
     Target Deploy => _ => _
         .Triggers(Pack)
+        .Description("Builds and deploys to cloud Foundry")
         .Triggers(DeployTask);
     
     Target Release => _ => _
