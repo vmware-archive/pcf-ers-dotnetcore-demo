@@ -52,7 +52,7 @@ class Build : NukeBuild
     [Parameter("Cloud Foundry Space")]
     readonly string CfSpace;
     [Parameter("Number of apps (for distributed tracing)")]
-    readonly int AppsCount;
+    readonly int AppsCount = 3;
 
     [Parameter("Skip logging in Cloud Foundry and use the current logged in session")] 
     readonly bool CfSkipLogin;
