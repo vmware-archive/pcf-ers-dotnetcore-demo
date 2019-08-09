@@ -9,14 +9,15 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-steps:
-- script: ./build.sh Deploy
-  displayName: 'Build'
-  env:
-    CfPassword: $(CfPassword)
-- task: PublishPipelineArtifact@0
-  inputs:
-    targetPath: $(Build.ArtifactStagingDirectory)
-    artifactName: drop
-  displayName: Publish artifacts
+
+# steps:
+# - script: ./build.sh Deploy
+#   displayName: 'Build'
+#   env:
+#     CfPassword: $(CfPassword)
+# - task: PublishPipelineArtifact@0
+#   inputs:
+#     targetPath: $(Build.ArtifactStagingDirectory)
+#     artifactName: drop
+#   displayName: Publish artifacts
 

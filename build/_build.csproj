@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="GitVersion.CommandLine.DotNetCore" Version="5.0.0-beta3-4" />
-    <PackageReference Include="Nuke.Common" Version="0.20.0-alpha0025" />
+    <PackageReference Include="Nuke.Common" Version="0.21.2" />
     <PackageReference Include="Octokit" Version="0.32.0" />
   </ItemGroup>
 

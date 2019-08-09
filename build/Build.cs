@@ -95,6 +95,7 @@ class Build : NukeBuild
         });
 
     Target Publish => _ => _
+        .Description("Publishes the project to a folder which is ready to be deployed to target machines")
         .Executes(() =>
         {
             Logger.Info(GitVersion == null);
@@ -109,6 +110,7 @@ class Build : NukeBuild
 
     Target Pack => _ => _
         .DependsOn(Publish)
+        .Description("Publishes the project and creates a zip package in artfiacts folder")
         .Executes(() =>
         {
             Directory.CreateDirectory(ArtifactsDirectory);
@@ -123,6 +125,7 @@ class Build : NukeBuild
         .Unlisted()
         .Executes(() =>
         {
+            
             CloudFoundryLogin(c => c
                 .SetUsername(CfUsername)
                 .SetPassword(CfPassword)
@@ -131,12 +134,12 @@ class Build : NukeBuild
                 .SetSpace(CfSpace));
         });
     
-    Target DeployTask => _ => _
+    Target Deploy => _ => _
         .DependsOn(CfLogin)
-        .After(Pack)
+        .DependsOn(Pack)
         .Requires(() => CfSpace, () => CfOrg)
         .Unlisted()
-        .Description("Deploys to cloud Foundry without building. Meant to be used on build servers as part of stage")
+        .Description("Deploys to Cloud Foundry")
         .Executes(async () =>
         {
             string appName = "ers1";
@@ -165,13 +168,8 @@ class Build : NukeBuild
                 .CombineWith(names,(cs,v) => cs.SetAppName(v)), degreeOfParallelism: 5);
         });
 
-    Target Deploy => _ => _
-        .Triggers(Pack)
-        .Description("Builds and deploys to cloud Foundry")
-        .Triggers(DeployTask);
-    
     Target Release => _ => _
-        .Description("Creates a GitHub release (or ammends existing) and uploads buildpack artifact")
+        .Description("Creates a GitHub release (or ammends existing) and uploads the artifact")
         .DependsOn(Publish)
         .Requires(() => GitHubToken)
         .Executes(async () =>
