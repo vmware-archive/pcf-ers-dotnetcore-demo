@@ -23,8 +23,10 @@ stages:
           runOnce:
             deploy:
               steps:
-                - download: current
-                  artifact: build
+                - task: DownloadPipelineArtifact@2
+                  inputs:
+                    artifact: build
+                    targetPath: '$(System.DefaultWorkingDirectory)' 
                 - script: ./build.sh Login --skip
                   env:
                     CfLogin: $(CfLogin)
