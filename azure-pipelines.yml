@@ -11,9 +11,9 @@ stages:
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
               artifactName: Publish artifacts
-  - stage: Deploy Dev
+  - stage: Dev
     jobs:
-      - deployment: Deploy Dev
+      - deployment: Dev
         environment: Dev
         strategy:
           runOnce:
