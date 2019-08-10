@@ -44,15 +44,15 @@ stages:
                 - script: chmod +x build.sh
                 - script: ./build.sh CfLogin --skip
                   env:
-                    CfLogin: $(CfLogin)
-                    CfPassword: $(CfPassword)
-                    CfOrg: $(CfOrg)
-                    CfSpace: $(CfSpace)
-                    CfApi: $(CfApi)
+                    CFUSERNAME: $(CfUsername)
+                    CFPASSWORD: $(CfPassword)
+                    CFORG: $(CfOrg)
+                    CFSPACE: $(CfSpace)
+                    CFAPI: $(CfApi)
                 - script: ./build.sh Deploy --skip
                   env:
-                    CfLogin: $(CfLogin)
-                    CfPassword: $(CfPassword)
-                    CfOrg: $(CfOrg)
-                    CfSpace: $(CfSpace)
-                    CfApi: $(CfApi)
+                    CFUSERNAME: $(CfUsername)
+                    CFPASSWORD: $(CfPassword)
+                    CFORG: $(CfOrg)
+                    CFSPACE: $(CfSpace)
+                    CFAPI: $(CfApi)
