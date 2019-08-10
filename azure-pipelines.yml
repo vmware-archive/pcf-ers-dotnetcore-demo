@@ -10,7 +10,11 @@ stages:
           - task: PublishPipelineArtifact@0
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
-              artifactName: Publish artifacts
+              artifactName: artifact
+          - task: PublishPipelineArtifact@0
+            inputs:
+              targetPath: $(System.DefaultWorkingDirectory)
+              artifactName: build
   - stage: Dev
     jobs:
       - deployment: Dev
@@ -19,6 +23,8 @@ stages:
           runOnce:
             deploy:
               steps:
+                - download: current
+                  artifact: build
                 - script: ./build.sh Login --skip
                   env:
                     CfLogin: $(CfLogin)
