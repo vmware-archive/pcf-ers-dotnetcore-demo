@@ -1,23 +1,31 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+envars: &envars
+  env:
+    CfLogin: $(CfLogin)
+    CfPassword: $(CfPassword)
+    CfOrg: $(CfOrg)
+    CfSpace: $(CfSpace)
+    
 
-trigger:
-- master
-
-pool:
-  vmImage: 'ubuntu-latest'
-
-
-# steps:
-# - script: ./build.sh Deploy
-#   displayName: 'Build'
-#   env:
-#     CfPassword: $(CfPassword)
-# - task: PublishPipelineArtifact@0
-#   inputs:
-#     targetPath: $(Build.ArtifactStagingDirectory)
-#     artifactName: drop
-#   displayName: Publish artifacts
-
+stages:
+  - stage: Build
+    jobs:
+      - job: compile
+        steps:
+          - script: ./build.sh Publish --skip
+          - script: ./build.sh Pack --skip
+          - task: PublishPipelineArtifact@0
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)
+              artifactName: Publish artifacts
+  - stage: Deploy Dev
+    jobs:
+      - deployment: Deploy Dev
+        environment: Dev
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - script: ./build.sh Login --skip
+                  <<: *envars
+                - script: ./build.sh Deploy --skip
+                  <<: *envars
