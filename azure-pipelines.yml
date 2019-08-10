@@ -24,7 +24,6 @@ stages:
             deploy:
               steps:
                 - download: none
-                
                 - task: DownloadPipelineArtifact@2
                   inputs:
                     artifact: build
@@ -34,17 +33,17 @@ stages:
                     artifact: build
                     targetPath: '$(Build.ArtifactStagingDirectory)' 
                 - script: chmod +x build.sh
-                - script: ./build.sh Login --skip
-                  env:
-                    CfLogin: $(CfLogin)
-                    CfPassword: $(CfPassword)
-                    CfOrg: $(CfOrg)
-                    CfSpace: $(CfSpace)
-                    CfApi: $(CfApi)
+                - script: ./build.sh CfLogin --skip
+                  # env:
+                  #   CfLogin: $(CfLogin)
+                  #   CfPassword: $(CfPassword)
+                  #   CfOrg: $(CfOrg)
+                  #   CfSpace: $(CfSpace)
+                  #   CfApi: $(CfApi)
                 - script: ./build.sh Deploy --skip
-                  env:
-                    CfLogin: $(CfLogin)
-                    CfPassword: $(CfPassword)
-                    CfOrg: $(CfOrg)
-                    CfSpace: $(CfSpace)
-                    CfApi: $(CfApi)
+                  # env:
+                  #   CfLogin: $(CfLogin)
+                  #   CfPassword: $(CfPassword)
+                  #   CfOrg: $(CfOrg)
+                  #   CfSpace: $(CfSpace)
+                  #   CfApi: $(CfApi)
