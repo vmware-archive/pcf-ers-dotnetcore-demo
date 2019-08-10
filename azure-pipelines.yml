@@ -24,7 +24,7 @@ stages:
             deploy:
               steps:
                 - download: none
-                - script: chmod +x build.sh
+                
                 - task: DownloadPipelineArtifact@2
                   inputs:
                     artifact: build
@@ -33,6 +33,7 @@ stages:
                   inputs:
                     artifact: build
                     targetPath: '$(Build.ArtifactStagingDirectory)' 
+                - script: chmod +x build.sh
                 - script: ./build.sh Login --skip
                   env:
                     CfLogin: $(CfLogin)
