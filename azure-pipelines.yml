@@ -5,15 +5,15 @@ stages:
     jobs:
       - job: compile
         steps:
-          - task: GitVersion@4
-            displayName: 'GitVersion'
-            inputs:
-              updateAssemblyInfo: true
-          - script: echo %Action%%BuildVersion%
-            displayName: 'Set build version'
-            env:
-              Action: '##vso[build.updatebuildnumber]'
-              BuildVersion: $(GitVersion.NuGetVersionV2)
+          # - task: GitVersion@5
+          #   displayName: 'GitVersion'
+          #   inputs:
+          #     runtime: core
+          # - script: echo %Action%%BuildVersion%
+          #   displayName: 'Set build version'
+          #   env:
+          #     Action: '##vso[build.updatebuildnumber]'
+          #     BuildVersion: $(GitVersion.NuGetVersionV2)
           - script: ./build.sh Publish --skip
           - script: ./build.sh Pack --skip
           - task: PublishPipelineArtifact@0
