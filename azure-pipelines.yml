@@ -23,19 +23,27 @@ stages:
           runOnce:
             deploy:
               steps:
+                - download: none
+                - script: chmod +x build.sh
                 - task: DownloadPipelineArtifact@2
                   inputs:
                     artifact: build
-                    targetPath: '$(System.DefaultWorkingDirectory)' 
+                    targetPath: '$(System.DefaultWorkingDirectory)'
+                - task: DownloadPipelineArtifact@2
+                  inputs:
+                    artifact: build
+                    targetPath: '$(Build.ArtifactStagingDirectory)' 
                 - script: ./build.sh Login --skip
                   env:
                     CfLogin: $(CfLogin)
                     CfPassword: $(CfPassword)
                     CfOrg: $(CfOrg)
                     CfSpace: $(CfSpace)
+                    CfApi: $(CfApi)
                 - script: ./build.sh Deploy --skip
                   env:
                     CfLogin: $(CfLogin)
                     CfPassword: $(CfPassword)
                     CfOrg: $(CfOrg)
                     CfSpace: $(CfSpace)
+                    CfApi: $(CfApi)
