@@ -1,10 +1,4 @@
-envars: &envars
-  env:
-    CfLogin: $(CfLogin)
-    CfPassword: $(CfPassword)
-    CfOrg: $(CfOrg)
-    CfSpace: $(CfSpace)
-    
+
 
 stages:
   - stage: Build
@@ -26,6 +20,14 @@ stages:
             deploy:
               steps:
                 - script: ./build.sh Login --skip
-                  <<: *envars
+                  env:
+                    CfLogin: $(CfLogin)
+                    CfPassword: $(CfPassword)
+                    CfOrg: $(CfOrg)
+                    CfSpace: $(CfSpace)
                 - script: ./build.sh Deploy --skip
-                  <<: *envars
+                  env:
+                    CfLogin: $(CfLogin)
+                    CfPassword: $(CfPassword)
+                    CfOrg: $(CfOrg)
+                    CfSpace: $(CfSpace)
