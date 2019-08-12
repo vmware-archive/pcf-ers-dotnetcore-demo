@@ -120,7 +120,7 @@ namespace Articulate.Controllers
                     var remainingTargets = string.Join(",", allTargets.Skip(1));
                     try
                     {
-                        _log.LogDebug($"Sending ping request to {nextTarget}");
+                        _log.LogInformation($"Sending ping request to {nextTarget}");
                         pong = await httpClient.GetStringAsync($"https://{nextTarget}/ping/?targets={remainingTargets}");
                     }
                     catch (Exception e)

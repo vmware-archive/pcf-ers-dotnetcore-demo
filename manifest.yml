@@ -1,10 +1,10 @@
 ---
 applications:
-- name: attendees
+- name: ers
   memory: 768M
   instances: 1
   random-route: true
-  path: publish/
+  path: src\bin\Debug\netcoreapp2.2\publish\
   services: []
   env:
     SKIP_SSL_VALIDATION: "true"

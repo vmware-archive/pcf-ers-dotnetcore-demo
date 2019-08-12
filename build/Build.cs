@@ -35,6 +35,7 @@ class Build : NukeBuild
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
+    string Runtime => "netcoreapp2.2";
     [Parameter("GitHub personal access token with access to the repo")]
     string GitHubToken;
 
@@ -133,7 +134,7 @@ class Build : NukeBuild
     
     Target DeployTask => _ => _
         .DependsOn(CfLogin)
-        .After(Pack)
+        .After(Publish)
         .Requires(() => CfSpace, () => CfOrg)
         .Unlisted()
         .Description("Deploys to cloud Foundry without building. Meant to be used on build servers as part of stage")
@@ -141,28 +142,29 @@ class Build : NukeBuild
         {
             string appName = "ers1";
             
-            var names = Enumerable.Range(1, AppsCount).Select(x => $"ers{x}").ToArray();;
-            CloudFoundryCreateSpace(c => c
-                .SetOrg(CfOrg)
-                .SetSpace(CfSpace));
-            CloudFoundryTarget(c => c
-                .SetSpace(CfSpace)
-                .SetOrg(CfOrg));
-            CloudFoundryCreateService(c => c
-                .SetService("p-service-registry")
-                .SetPlan(CfApiEndpoint.Contains("api.run.pivotal.io") ? "trial" : "standard")
-                .SetInstanceName("eureka"));
+            var names = Enumerable.Range(1, AppsCount).Select(x => $"ers{x}").ToArray();;c
+//            CloudFoundryCreateSpace(c => c
+//                .SetOrg(CfOrg)
+//                .SetSpace(CfSpace));
+//            CloudFoundryTarget(c => c
+//                .SetSpace(CfSpace)
+//                .SetOrg(CfOrg));
+//            CloudFoundryCreateService(c => c
+//                .SetService("p-service-registry")
+//                .SetPlan(CfApiEndpoint.Contains("api.run.pivotal.io") ? "trial" : "standard")
+//                .SetInstanceName("eureka"));
             CloudFoundryPush(c => c
                 .SetRandomRoute(true)
-                .SetPath(ArtifactsDirectory / PackageZipName)
+                .SetPath(RootDirectory / "src" / "bin" / Configuration / Runtime / "publish")
+//                .SetPath(ArtifactsDirectory / PackageZipName)
                 .CombineWith(names,(cs,v) => cs.SetAppName(v)), degreeOfParallelism: 1);
-            await CloudFoundryEnsureServiceReady("eureka");
-            CloudFoundryBindService(c => c
-                .SetServiceInstance("eureka")
-                .CombineWith(names,(cs,v) => cs.SetAppName(v)), degreeOfParallelism: 5);
-            CloudFoundryRestart(c => c
-                .SetAppName(appName)
-                .CombineWith(names,(cs,v) => cs.SetAppName(v)), degreeOfParallelism: 5);
+//            await CloudFoundryEnsureServiceReady("eureka");
+//            CloudFoundryBindService(c => c
+//                .SetServiceInstance("eureka")
+//                .CombineWith(names,(cs,v) => cs.SetAppName(v)), degreeOfParallelism: 5);
+//            CloudFoundryRestart(c => c
+//                .SetAppName(appName)
+//                .CombineWith(names,(cs,v) => cs.SetAppName(v)), degreeOfParallelism: 5);
         });
 
     Target Deploy => _ => _
