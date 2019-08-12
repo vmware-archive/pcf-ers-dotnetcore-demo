@@ -1,22 +1,58 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
 
-trigger:
-- master
 
-pool:
-  vmImage: 'ubuntu-latest'
-
-steps:
-- script: ./build.sh Deploy
-  displayName: 'Build'
-  env:
-    CfPassword: $(CfPassword)
-- task: PublishPipelineArtifact@0
-  inputs:
-    targetPath: $(Build.ArtifactStagingDirectory)
-    artifactName: drop
-  displayName: Publish artifacts
-
+stages:
+  - stage: Build
+    jobs:
+      - job: compile
+        steps:
+          # - task: GitVersion@5
+          #   displayName: 'GitVersion'
+          #   inputs:
+          #     runtime: core
+          # - script: echo %Action%%BuildVersion%
+          #   displayName: 'Set build version'
+          #   env:
+          #     Action: '##vso[build.updatebuildnumber]'
+          #     BuildVersion: $(GitVersion.NuGetVersionV2)
+          - script: ./build.sh Publish --skip
+          - script: ./build.sh Pack --skip
+          - task: PublishPipelineArtifact@0
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)
+              artifactName: artifact
+          - task: PublishPipelineArtifact@0
+            inputs:
+              targetPath: $(System.DefaultWorkingDirectory)
+              artifactName: build
+  - stage: Dev
+    jobs:
+      - deployment: Dev
+        environment: Dev
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: none
+                - task: DownloadPipelineArtifact@2
+                  inputs:
+                    artifact: build
+                    targetPath: '$(System.DefaultWorkingDirectory)'
+                - task: DownloadPipelineArtifact@2
+                  inputs:
+                    artifact: build
+                    targetPath: '$(Build.ArtifactStagingDirectory)' 
+                - script: chmod +x build.sh
+                - script: ./build.sh CfLogin --skip
+                  env:
+                    CFUSERNAME: $(CfUsername)
+                    CFPASSWORD: $(CfPassword)
+                    CFORG: $(CfOrg)
+                    CFSPACE: $(CfSpace)
+                    CFAPI: $(CfApi)
+                - script: ./build.sh Deploy --skip
+                  env:
+                    CFUSERNAME: $(CfUsername)
+                    CFPASSWORD: $(CfPassword)
+                    CFORG: $(CfOrg)
+                    CFSPACE: $(CfSpace)
+                    CFAPI: $(CfApi)
