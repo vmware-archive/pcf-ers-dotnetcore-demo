@@ -39,7 +39,7 @@ stages:
                     targetPath: '$(System.DefaultWorkingDirectory)'
                 - task: DownloadPipelineArtifact@2
                   inputs:
-                    artifact: build
+                    artifact: artifact
                     targetPath: '$(Build.ArtifactStagingDirectory)' 
                 - script: chmod +x build.sh
                 - script: ./build.sh CfLogin --skip
