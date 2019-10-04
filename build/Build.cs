@@ -1,10 +1,8 @@
-using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using Microsoft.Build.Tasks;
 using Nuke.Common;
-using Nuke.Common.BuildServers;
+using Nuke.Common.CI;
 using Nuke.Common.Execution;
 using Nuke.Common.Git;
 using Nuke.Common.ProjectModel;
@@ -15,14 +13,17 @@ using Nuke.Common.Tools.Git;
 using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Utilities.Collections;
 using Octokit;
-using static Nuke.Common.EnvironmentInfo;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.CloudFoundry.CloudFoundryTasks;
 
+
 [CheckBuildProjectConfigurations]
 [UnsetVisualStudioEnvironmentVariables]
+//[AzureDevopsConfigurationGenerator(
+//    VcsTriggeredTargets = new[]{"Pack"}
+//)]
 class Build : NukeBuild
 {
     /// Support plugins are available for:
@@ -40,7 +41,10 @@ class Build : NukeBuild
     string GitHubToken;
 
     [Solution] readonly Solution Solution;
-    [GitRepository] readonly GitRepository GitRepository;
+
+    [GitRepository] GitRepository GitRepository;
+//    [GitVersion] public GitVersion GitVersion { get; set; }
+
     [GitVersion] readonly GitVersion GitVersion;
     [Parameter("Cloud Foundry Username")]
     readonly string CfUsername;
@@ -53,19 +57,21 @@ class Build : NukeBuild
     [Parameter("Cloud Foundry Space")]
     readonly string CfSpace;
     [Parameter("Number of apps (for distributed tracing)")]
-    readonly int AppsCount = 3;
+    readonly int AppsCount = 3;    
+    [Parameter("Type of database plan (default: db-small)")]
+    readonly string DbPlan = "db-small";
 
     [Parameter("Skip logging in Cloud Foundry and use the current logged in session")] 
     readonly bool CfSkipLogin;
 
 
     AbsolutePath SourceDirectory => RootDirectory / "src";
-    AbsolutePath ArtifactsDirectory => (AbsolutePath)TeamServices.Instance?.ArtifactStagingDirectory ??  
-                                       (FileExists((AbsolutePath)"/tmp/garden-init") ? 
-                                           RootDirectory / "../artifacts" : 
-                                           RootDirectory / "artifacts");
+    AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
     AbsolutePath PublishDirectory => RootDirectory / "src" / "bin" / Configuration / "netcoreapp2.2" / "publish";
     string PackageZipName => $"articulate-{GitVersion.MajorMinorPatch}.zip";
+
+    // Target Serialize => _ => _
+    //     .Executes(() => File.WriteAllText(ArtifactsDirectory / "state.json", JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings(){ ContractResolver = new MyContractResolver()})));
     
     Target Clean => _ => _
         .Before(Restore)
@@ -112,6 +118,7 @@ class Build : NukeBuild
     Target Pack => _ => _
         .DependsOn(Publish)
         .Description("Publishes the project and creates a zip package in artfiacts folder")
+        .Produces(ArtifactsDirectory)
         .Executes(() =>
         {
             Directory.CreateDirectory(ArtifactsDirectory);
@@ -126,20 +133,16 @@ class Build : NukeBuild
         .Unlisted()
         .Executes(() =>
         {
-            
-            CloudFoundryLogin(c => c
+            CloudFoundryApi(c => c.SetUrl(CfApiEndpoint));
+            CloudFoundryAuth(c => c
                 .SetUsername(CfUsername)
-                .SetPassword(CfPassword)
-                .SetApiEndpoint(CfApiEndpoint)
-                .SetOrg(CfOrg)
-                .SetSpace(CfSpace));
+                .SetPassword(CfPassword));
         });
     
     Target Deploy => _ => _
         .DependsOn(CfLogin)
         .After(Pack)
         .Requires(() => CfSpace, () => CfOrg)
-        .Unlisted()
         .Description("Deploys to Cloud Foundry")
         .Executes(async () =>
         {
@@ -154,15 +157,23 @@ class Build : NukeBuild
                 .SetOrg(CfOrg));
             CloudFoundryCreateService(c => c
                 .SetService("p-service-registry")
-                .SetPlan(CfApiEndpoint.Contains("api.run.pivotal.io") ? "trial" : "standard")
+                .SetPlan(CfApiEndpoint?.Contains("api.run.pivotal.io") ?? false ? "trial" : "standard")
                 .SetInstanceName("eureka"));
+            CloudFoundryCreateService(c => c
+                .SetService("p.mysql")
+                .SetPlan(DbPlan)
+                .SetInstanceName("mysql"));
             CloudFoundryPush(c => c
                 .SetRandomRoute(true)
                 .SetPath(ArtifactsDirectory / PackageZipName)
                 .CombineWith(names,(cs,v) => cs.SetAppName(v)), degreeOfParallelism: 1);
             await CloudFoundryEnsureServiceReady("eureka");
+            await CloudFoundryEnsureServiceReady("mysql");
             CloudFoundryBindService(c => c
                 .SetServiceInstance("eureka")
+                .CombineWith(names,(cs,v) => cs.SetAppName(v)), degreeOfParallelism: 5);
+            CloudFoundryBindService(c => c
+                .SetServiceInstance("mysql")
                 .CombineWith(names,(cs,v) => cs.SetAppName(v)), degreeOfParallelism: 5);
             CloudFoundryRestart(c => c
                 .SetAppName(appName)

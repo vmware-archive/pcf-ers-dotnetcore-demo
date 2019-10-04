@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Steeltoe.CloudFoundry.Connector;
+using Steeltoe.CloudFoundry.Connector.MySql;
 using Steeltoe.CloudFoundry.Connector.MySql.EFCore;
 using Steeltoe.CloudFoundry.Connector.Services;
 using Steeltoe.Discovery.Client;
@@ -58,7 +59,11 @@ namespace Articulate
                     options.UseSqlite("DataSource=:memory:");
                 
             }, _isMySqlServiceBound ? ServiceLifetime.Scoped : ServiceLifetime.Singleton);
-
+            if (_isMySqlServiceBound)
+            {
+                services.AddMySqlConnection(Configuration);
+            }
+            
             services.AddDiscoveryClient(Configuration);
             return services.BuildServiceProvider(false);
         }

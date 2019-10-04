@@ -11,8 +11,9 @@
 
   <ItemGroup>
     <PackageReference Include="CloudFoundry.CommandLine.linux-x64" Version="6.46.0" />
+    <PackageReference Include="CloudFoundry.CommandLine.win-x64" Version="6.46.0" />
     <PackageReference Include="GitVersion.CommandLine.DotNetCore" Version="5.0.0-beta3-4" />
-    <PackageReference Include="Nuke.Common" Version="0.21.2" />
+    <PackageReference Include="Nuke.Common" Version="0.22.2" />
     <PackageReference Include="Octokit" Version="0.32.0" />
   </ItemGroup>
 
@@ -33,5 +34,9 @@
     <None Include="..\.travis.yml" Condition="Exists('..\.travis.yml')" />
     <None Include="..\GitVersion.yml" Condition="Exists('..\GitVersion.yml')" />
   </ItemGroup>
+
+<!--  <ItemGroup>-->
+<!--    <ProjectReference Include="..\..\nuke-build-common\source\Nuke.Common\Nuke.Common.csproj" />-->
+<!--  </ItemGroup>-->
 
 </Project>
